@@ -7,8 +7,20 @@
       "RelativeMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|c:\\users\\administrator\\source\\repos\\intron.lasermonitor\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|solutionrelative:mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|c:\\users\\administrator\\source\\repos\\intron.lasermonitor\\services\\excelexportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|solutionrelative:services\\excelexportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|c:\\users\\administrator\\source\\repos\\intron.lasermonitor\\viewmodels\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|solutionrelative:viewmodels\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|c:\\users\\administrator\\source\\repos\\intron.lasermonitor\\models\\measurement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|solutionrelative:models\\measurement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|c:\\users\\administrator\\source\\repos\\intron.lasermonitor\\services\\serialservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4776C712-DC71-4C35-BEE4-D89206B441E4}|Intron.LaserMonitor.csproj|solutionrelative:services\\serialservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,8 +30,21 @@
       "DocumentGroups": [
         {
           "DockedHeight": 528,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ExcelExportService.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\Services\\ExcelExportService.cs",
+              "RelativeDocumentMoniker": "Services\\ExcelExportService.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\Services\\ExcelExportService.cs",
+              "RelativeToolTip": "Services\\ExcelExportService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-12T04:06:24.343Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -34,15 +59,41 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\MainWindow.xaml.cs",
-              "RelativeDocumentMoniker": "MainWindow.xaml.cs",
-              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\MainWindow.xaml.cs",
-              "RelativeToolTip": "MainWindow.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "MainViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\ViewModels\\MainViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModels\\MainViewModel.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\ViewModels\\MainViewModel.cs",
+              "RelativeToolTip": "ViewModels\\MainViewModel.cs",
+              "ViewState": "AgIAALMAAAAAAAAAAAAUwNEAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-11T21:46:21.078Z",
+              "WhenOpened": "2025-09-12T01:23:29.18Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SerialService.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\Services\\SerialService.cs",
+              "RelativeDocumentMoniker": "Services\\SerialService.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\Services\\SerialService.cs",
+              "RelativeToolTip": "Services\\SerialService.cs",
+              "ViewState": "AgIAAF0AAAAAAAAAAADwv3kAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-11T21:57:30.515Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Measurement.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\Models\\Measurement.cs",
+              "RelativeDocumentMoniker": "Models\\Measurement.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\Intron.LaserMonitor\\Models\\Measurement.cs",
+              "RelativeToolTip": "Models\\Measurement.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-11T21:56:00.837Z",
               "EditorCaption": ""
             }
           ]

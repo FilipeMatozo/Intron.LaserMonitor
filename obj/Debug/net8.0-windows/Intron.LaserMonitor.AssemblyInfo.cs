@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Intron.LaserMonitor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+741f735db51426f53b7fa2225a1ad33ae84af7c7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Intron.LaserMonitor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Intron.LaserMonitor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
