@@ -213,6 +213,7 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <ContentControl HorizontalAlignment="Center" Content="{Binding CurrentUserControl}" />
+        <ContentControl HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch" Content="{Binding CurrentUserControl}" />
     </Grid>
 </Window>
