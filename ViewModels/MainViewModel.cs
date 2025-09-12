@@ -45,13 +45,10 @@ namespace Intron.LaserMonitor.ViewModels
         public PlotModel PlotModel { get; private set; }
         public ObservableCollection<DataPoint> PlotPoints { get; private set; }
         
-        public MainViewModel()
+        public MainViewModel(ISerialService serialService, IExcelExportService excelExportService)
         {
-            _serialService = new SerialService();
-            _excelService = new ExcelExportService();
-            _allMeasurements = new List<Measurement>();
-
-            PlotPoints = new ObservableCollection<DataPoint>();
+            _serialService = serialService;
+            _excelService = excelExportService;
 
             SetupPlotModel();
 

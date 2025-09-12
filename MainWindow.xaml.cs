@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Intron.LaserMonitor.ViewModels;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,9 +14,20 @@ namespace Intron.LaserMonitor
 {
     public partial class MainWindow : Window
     {
+        public MainViewModel ViewModel
+        {
+            get;
+        }
         public MainWindow()
         {
             InitializeComponent();
+            ViewModel = App.GetService<MainViewModel>();
+            DataContext = ViewModel;
+        }
+
+        private void ComboBox_DropDownOpened(object sender, EventArgs e)
+        {
+            ViewModel.RefreshPortsCommand.Execute(this);
         }
     }
 }
