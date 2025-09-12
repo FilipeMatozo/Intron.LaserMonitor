@@ -7,7 +7,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <FontFamily x:Key="Inter">pack://application:,,,/Assets/Fonts/#Inter</FontFamily>
-            <fx:InvertEffect x:Key="InvertOnHover" x:Shared="False" />
+            <!--<fx:InvertEffect x:Key="InvertOnHover" x:Shared="False" />-->
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Themes/IntronLightTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>

@@ -19,12 +19,12 @@
         <DataTemplate DataType="{x:Type vm:MonitoringViewModel}">
             <views:MonitoringView Margin="100, 0" />
         </DataTemplate>
-        <fx:InvertChromaKeyEffect
+        <!--<fx:InvertChromaKeyEffect
             x:Key="InvertKeyBlack"
             x:Shared="False"
             KeyColor="Black"
             Softness="0.06"
-            Tolerance="0.12" />
+            Tolerance="0.12" />-->
 
         <Storyboard x:Key="OpenMenu">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SideMenu" Storyboard.TargetProperty="(FrameworkElement.Width)">
@@ -213,6 +213,6 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <ContentControl Content="{Binding CurrentUserControl}" />
+        <ContentControl HorizontalAlignment="Center" Content="{Binding CurrentUserControl}" />
     </Grid>
 </Window>
