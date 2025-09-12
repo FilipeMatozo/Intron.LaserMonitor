@@ -19,7 +19,7 @@ namespace Intron.LaserMonitor.Services
                 worksheet.Cells[1, 1].Value = "Timestamp";
                 worksheet.Cells[1, 2].Value = "Distância (mm)";
                 worksheet.Cells[1, 3].Value = "Distância Absoluta (mm)";
-                worksheet.Cells[1, 1, 1, 2].Style.Font.Bold = true;
+                worksheet.Cells[1, 1, 1, 3].Style.Font.Bold = true;
 
                 int row = 2;
                 foreach (var point in data)

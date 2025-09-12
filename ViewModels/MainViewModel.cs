@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Metrics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace Intron.LaserMonitor.ViewModels
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ConnectText))]
+        [NotifyPropertyChangedFor(nameof(IsConnectedText))]
         [NotifyCanExecuteChangedFor(nameof(StartMeasurementCommand))]
         [NotifyCanExecuteChangedFor(nameof(StopMeasurementCommand))]
         [NotifyCanExecuteChangedFor(nameof(ZeroOffsetCommand))]
@@ -44,7 +46,12 @@ namespace Intron.LaserMonitor.ViewModels
         private string _currentDistance = "N/A";
         public string ConnectText
         {
-            get => IsConnected ? "Disconnect" : "Connect";
+            get => IsConnected ? "Desconectar" : "Conectar";
+        }
+
+        public string IsConnectedText
+        {
+            get => IsConnected ? "Conectado" : "Desconectado";
         }
         public bool ConnectBtnEnabled
         {
@@ -182,7 +189,7 @@ namespace Intron.LaserMonitor.ViewModels
                 }
             }
         }
-        private bool CanExport() => _allMeasurements.Any();
+        private bool CanExport() => _allMeasurements.Count > 0;
 
         private void SetupPlotModel()
         {
@@ -226,8 +233,9 @@ namespace Intron.LaserMonitor.ViewModels
             {
                 string distanceStr = data.Replace("D=", "").Replace("m", "").Trim();
 
-                if (double.TryParse(distanceStr, out var distance))
+                if (double.TryParse(distanceStr, NumberStyles.Float, CultureInfo.InvariantCulture, out var distance))
                 {
+                    distance = distance * 1000;
                     var measurement = new Measurement
                     {
                         Timestamp = DateTime.Now,
@@ -239,11 +247,11 @@ namespace Intron.LaserMonitor.ViewModels
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+                        ExportToExcelCommand.NotifyCanExecuteChanged();
                     });
                     PlotModel.InvalidatePlot(true);
 
-                    CurrentDistance = $"{measurement.Distance}mm | {measurement.DistanceAbsolute}mm";
-                    ExportToExcelCommand.NotifyCanExecuteChanged();
+                    CurrentDistance = $"Relativa: {measurement.Distance}mm | Absoluta: {measurement.DistanceAbsolute}mm";
                 }
             }
             else if (data.StartsWith("E="))
@@ -258,8 +266,10 @@ namespace Intron.LaserMonitor.ViewModels
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+                    ExportToExcelCommand.NotifyCanExecuteChanged(); 
                 });
                 PlotModel.InvalidatePlot(true);
+
                 CurrentDistance = "N/A";
             }
         }
