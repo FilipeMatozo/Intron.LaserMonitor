@@ -9,16 +9,82 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Fonts\Inter-Black.ttf" />
+    <None Remove="Assets\Fonts\Inter-Bold.ttf" />
+    <None Remove="Assets\Fonts\Inter-ExtraBold.ttf" />
+    <None Remove="Assets\Fonts\Inter-ExtraLight.ttf" />
+    <None Remove="Assets\Fonts\Inter-Light.ttf" />
+    <None Remove="Assets\Fonts\Inter-Medium.ttf" />
+    <None Remove="Assets\Fonts\Inter-Regular.ttf" />
+    <None Remove="Assets\Fonts\Inter-SemiBold.ttf" />
+    <None Remove="Assets\Fonts\Inter-Thin.ttf" />
+    <None Remove="Assets\Images\icons8-grafico-24-white.png" />
+    <None Remove="Assets\Images\icons8-grafico-24.png" />
+    <None Remove="Assets\Images\icons8-graph-gif.gif" />
+    <None Remove="Assets\Images\icons8-graph-gif.png" />
+    <None Remove="Assets\Images\logo-intron-50.png" />
+    <None Remove="Assets\Images\logo-name-min-50.png" />
+    <None Remove="Assets\Images\monitor-graph-white.png" />
+    <None Remove="Assets\Images\monitor-graph.png" />
+    <None Remove="Shaders\Invert.ps" />
+    <None Remove="Shaders\InvertChromaKey.ps" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Images\icons8-grafico-24-white.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\icons8-grafico-24.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="EPPlus" Version="8.1.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-rc.1.25451.107" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
     <PackageReference Include="System.IO.Ports" Version="9.0.9" />
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\" />
+    <Resource Include="Assets\Fonts\Inter-Black.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\Inter-Bold.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\Inter-ExtraBold.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\Inter-ExtraLight.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\Inter-Light.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\Inter-Medium.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\Inter-Regular.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\Inter-SemiBold.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\Inter-Thin.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\icons8-graph-gif.gif" />
+    <Resource Include="Assets\Images\logo-intron-50.png">
+      <CopyToOutputDirectory></CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\logo-name-min-50.png" />
+    <Resource Include="Shaders\Invert.ps" />
+    <Resource Include="Shaders\InvertChromaKey.ps">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

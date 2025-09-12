@@ -1,0 +1,218 @@
+﻿<Window
+    x:Class="Intron.LaserMonitor.Views.ShellWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:fx="clr-namespace:Intron.LaserMonitor.Effects"
+    xmlns:gif="http://wpfanimatedgif.codeplex.com"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:Intron.LaserMonitor.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="clr-namespace:Intron.LaserMonitor.Views"
+    xmlns:vm="clr-namespace:Intron.LaserMonitor.ViewModels"
+    Title="ShellWindow"
+    Width="1024"
+    Height="600"
+    mc:Ignorable="d">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:MonitoringViewModel}">
+            <views:MonitoringView Margin="100, 0" />
+        </DataTemplate>
+        <fx:InvertChromaKeyEffect
+            x:Key="InvertKeyBlack"
+            x:Shared="False"
+            KeyColor="Black"
+            Softness="0.06"
+            Tolerance="0.12" />
+
+        <Storyboard x:Key="OpenMenu">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SideMenu" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                <EasingDoubleKeyFrame KeyTime="0" Value="86" />
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="190" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="CloseMenu">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SideMenu" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                <EasingDoubleKeyFrame KeyTime="0" Value="190" />
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="86" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Window.Resources>
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="MouseEnter" SourceName="SideMenu">
+            <BeginStoryboard Storyboard="{StaticResource OpenMenu}" />
+        </EventTrigger>
+        <EventTrigger RoutedEvent="MouseLeave" SourceName="SideMenu">
+            <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+        </EventTrigger>
+    </Window.Triggers>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="MouseEnter" SourceName="SideMenu">
+            <i:InvokeCommandAction Command="{Binding OpenMenuCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="MouseLeave" SourceName="SideMenu">
+            <i:InvokeCommandAction Command="{Binding OpenMenuCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid
+            x:Name="SideMenu"
+            Grid.Column="0"
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            Width="86"
+            HorizontalAlignment="Left"
+            Background="{DynamicResource White}"
+            Grid.ZIndex="3">
+            <Border BorderBrush="Gray" BorderThickness="0,0,1.2,0" />
+            <StackPanel>
+                <StackPanel>
+                    <DockPanel
+                        Width="50"
+                        Height="50"
+                        Margin="18,8,0,18"
+                        HorizontalAlignment="Left"
+                        Background="{DynamicResource White}"
+                        Visibility="{Binding LogoCloseMenu}">
+                        <Viewbox>
+                            <Image Source="/Assets/Images/logo-intron-50.png" Stretch="None" />
+                        </Viewbox>
+                    </DockPanel>
+
+                    <DockPanel
+                        Width="154"
+                        Height="50"
+                        Margin="18,8,0,18"
+                        HorizontalAlignment="Left"
+                        Background="{DynamicResource White}"
+                        Visibility="{Binding LogoOpenMenu}">
+
+                        <Button
+                            Margin="0"
+                            Padding="0"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            Command="{Binding OpenMainWindowCommand}"
+                            Cursor="Hand">
+                            <Viewbox>
+                                <Image Source="/Assets/Images/logo-name-min-50.png" Stretch="None" />
+                            </Viewbox>
+                        </Button>
+                    </DockPanel>
+
+                </StackPanel>
+
+                <StackPanel>
+                    <ItemsControl ItemsSource="{Binding Path=MenuItemModelList}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <Button
+                                        Width="{Binding ButtonWidth}"
+                                        Height="48"
+                                        BorderBrush="{DynamicResource White}"
+                                        Command="{Binding ActionCommand}"
+                                        Cursor="Hand">
+
+                                        <Button.Style>
+                                            <Style TargetType="{x:Type Button}">
+                                                <Setter Property="Background" Value="{DynamicResource White}" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border
+                                                                Background="{TemplateBinding Background}"
+                                                                BorderBrush="{DynamicResource White}"
+                                                                BorderThickness="1">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition MaxWidth="50" />
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Image
+                                                                        x:Name="buttonImage"
+                                                                        Grid.Column="0"
+                                                                        Width="18"
+                                                                        Height="18"
+                                                                        Margin="12,0,0,0"
+                                                                        VerticalAlignment="Center"
+                                                                           CacheMode="BitmapCache"
+                                                                           gif:ImageBehavior.AnimatedSource="{Binding ImagePath}" />
+
+                                                                    <TextBlock
+                                                                        Grid.Column="1"
+                                                                        Width="140"
+                                                                        Margin="12,0,0,0"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        FontFamily="{DynamicResource Inter}"
+                                                                        FontSize="9pt"
+                                                                        FontWeight="Medium"
+                                                                        Text="{Binding Title}"
+                                                                        Visibility="{Binding TextVisibility}">
+                                                                        <TextBlock.Style>
+                                                                            <Style TargetType="TextBlock">
+                                                                                <Setter Property="Foreground" Value="Gray" />
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                                                                                        <Setter Property="Foreground" Value="{DynamicResource White}" />
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </TextBlock.Style>
+                                                                    </TextBlock>
+                                                                </Grid>
+                                                            </Border>
+
+                                                            <ControlTemplate.Triggers>
+                                                                <!--  Pode usar Trigger direto em vez de DataTrigger  -->
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <!--<Setter TargetName="buttonImage"
+                                                                            Property="Effect"
+                                                                            Value="{StaticResource InvertKeyBlack}" />-->
+                                                                    <Setter TargetName="buttonImage" Property="gif:ImageBehavior.AnimatedSource" Value="{Binding SelectedImagePath}" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+
+
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource IntronBlue}" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <ContentControl Content="{Binding CurrentUserControl}" />
+    </Grid>
+</Window>

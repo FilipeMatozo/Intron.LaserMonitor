@@ -6,6 +6,7 @@ using System.Windows;
 using Intron.LaserMonitor.Contracts.Services;
 using Intron.LaserMonitor.Services;
 using Intron.LaserMonitor.ViewModels;
+using Intron.LaserMonitor.Views;
 
 namespace Intron.LaserMonitor
 {
@@ -27,7 +28,7 @@ namespace Intron.LaserMonitor
 
             return service;
         }
-        private Window MainWindow { get; }
+        private Window MainWindow { get; } = new();
 
         public App()
         {
@@ -43,12 +44,21 @@ namespace Intron.LaserMonitor
                 // Configure views and viewModels
                 services.AddTransient<MainViewModel>();
                 services.AddTransient<MainWindow>();
+                services.AddTransient<ShellWindow>();
+                services.AddTransient<ShellViewModel>();
+                services.AddTransient<MonitoringView>();
+                services.AddTransient<MonitoringViewModel>();
             })
             .Build();
+        }
 
-            MainWindow = GetService<MainWindow>();
-            MainWindow.Show();
-            MainWindow.Activate();
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            var window = GetService<ShellWindow>();
+            window.Show();
+            window.Activate();
         }
     }
 
