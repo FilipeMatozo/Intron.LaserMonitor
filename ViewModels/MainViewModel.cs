@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Intron.LaserMonitor.Contracts.Services;
 using Intron.LaserMonitor.Models;
 using Intron.LaserMonitor.Services;
 using Microsoft.VisualBasic;
@@ -20,8 +21,8 @@ namespace Intron.LaserMonitor.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
-        private readonly SerialService _serialService;
-        private readonly ExcelExportService _excelService;
+        private readonly ISerialService _serialService;
+        private readonly IExcelExportService _excelService;
         private readonly List<Measurement> _allMeasurements;
 
         [ObservableProperty]
@@ -116,9 +117,9 @@ namespace Intron.LaserMonitor.ViewModels
             }
         }
 
-        private void OnConnected() => IsConnected = true;
+        private void OnConnected(object sender, EventArgs e) => IsConnected = true;
 
-        private void OnDisconnected() => IsConnected = false;
+        private void OnDisconnected(object sender, EventArgs e) => IsConnected = false;
 
         [RelayCommand(CanExecute = nameof(CanExport))]
         private void ExportToExcel()
@@ -180,8 +181,9 @@ namespace Intron.LaserMonitor.ViewModels
             PlotModel.Series.Add(lineSeries);
         }
 
-        private void OnDataReceived(string data)
+        private void OnDataReceived(object sender, Models.Events.DataReceivedEventArgs dataReceivedEventArgs)
         {
+            var data = dataReceivedEventArgs.Data;
             Application.Current.Dispatcher.Invoke(() =>
             {
                 if (data.StartsWith("D=") && data.EndsWith("m"))
@@ -199,7 +201,6 @@ namespace Intron.LaserMonitor.ViewModels
                         _allMeasurements.Add(measurement);
 
                         PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), distance));
-
                         PlotModel.InvalidatePlot(true);
 
                         CurrentDistance = $"{distance:F3}";

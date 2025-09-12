@@ -1,11 +1,12 @@
-﻿using Intron.LaserMonitor.Models;
+﻿using Intron.LaserMonitor.Contracts.Services;
+using Intron.LaserMonitor.Models;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Intron.LaserMonitor.Services
 {
-    public class ExcelExportService
+    public class ExcelExportService : IExcelExportService
     {
         public void Export(IEnumerable<Measurement> data, string filePath)
         {

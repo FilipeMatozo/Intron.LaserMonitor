@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 using System.IO.Ports;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
+using Intron.LaserMonitor.Contracts.Services;
 
 namespace Intron.LaserMonitor.Services
 {
-    public class SerialService
+    public class SerialService : ISerialService
     {
         private SerialPort _serialPort;
 
-        public event Action Connected;   
-        public event Action Disconnected;   
-        public event Action<string> DataReceived;   
+        public event EventHandler Connected;   
+        public event EventHandler Disconnected;   
+        public event EventHandler<Models.Events.DataReceivedEventArgs> DataReceived;   
 
-        public string[] GetAvailableSerialPorts()
+        public IEnumerable<string> GetAvailableSerialPorts()
         {
             return SerialPort.GetPortNames();
         }
@@ -39,7 +40,7 @@ namespace Intron.LaserMonitor.Services
                 _serialPort.DataReceived += OnDataReceived;
                 _serialPort.Open();
 
-                Connected?.Invoke();
+                Connected?.Invoke(this, new());
                 return true;
             }
             catch (Exception ex)
@@ -57,7 +58,7 @@ namespace Intron.LaserMonitor.Services
             try
             {
                 string data = _serialPort.ReadLine();
-                DataReceived?.Invoke(data);
+                DataReceived?.Invoke(this, new(data));
             }
             catch (Exception ex)
             {
@@ -85,7 +86,7 @@ namespace Intron.LaserMonitor.Services
             finally
             {
                 _serialPort.Dispose();
-                Disconnected?.Invoke();
+                Disconnected?.Invoke(this, new());
             }
         }
 
