@@ -23,61 +23,90 @@ namespace Intron.LaserMonitor.ViewModels
     {
         private readonly ISerialService _serialService;
         private readonly IExcelExportService _excelService;
-        private readonly List<Measurement> _allMeasurements;
+        private readonly List<Measurement> _allMeasurements = new();
 
         [ObservableProperty]
-        private ObservableCollection<string> _availablePorts;
+        private ObservableCollection<string> _availablePorts = new();
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
-        private string _selectedPort;
+        [NotifyPropertyChangedFor(nameof(ConnectBtnEnabled))]
+        [NotifyCanExecuteChangedFor(nameof(ConnectDisconnectCommand))]
+        private string _selectedPort = string.Empty;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
-        [NotifyCanExecuteChangedFor(nameof(DisconnectCommand))]
+        [NotifyPropertyChangedFor(nameof(ConnectText))]
         [NotifyCanExecuteChangedFor(nameof(StartMeasurementCommand))]
         [NotifyCanExecuteChangedFor(nameof(StopMeasurementCommand))]
         private bool _isConnected = false;
 
         [ObservableProperty]
         private string _currentDistance = "N/A";
-
+        public string ConnectText
+        {
+            get => IsConnected ? "Disconnect" : "Connect";
+        }
+        public bool ConnectBtnEnabled
+        {
+            get => !string.IsNullOrWhiteSpace(SelectedPort);
+        }
         public PlotModel PlotModel { get; private set; }
-        public ObservableCollection<DataPoint> PlotPoints { get; private set; }
-        
+        public ObservableCollection<DataPoint> PlotPoints { get; private set; } = new();
+
         public MainViewModel(ISerialService serialService, IExcelExportService excelExportService)
         {
             _serialService = serialService;
             _excelService = excelExportService;
 
             SetupPlotModel();
+            LoadComboboxes();
+            SubscribeEvents();
+        }
 
-            AvailablePorts = new ObservableCollection<string>(_serialService.GetAvailableSerialPorts());
+        private void LoadComboboxes()
+        {
+            RefreshPorts();
+            SelectedPort = AvailablePorts.FirstOrDefault()!;
+        }
 
+        private void UnsubscribeEvents()
+        {
+            _serialService.DataReceived -= OnDataReceived;
+            _serialService.Connected -= OnConnected;
+            _serialService.Disconnected -= OnDisconnected;
+        }
+
+        private void SubscribeEvents()
+        {
             _serialService.DataReceived += OnDataReceived;
             _serialService.Connected += OnConnected;
             _serialService.Disconnected += OnDisconnected;
         }
 
-
-        [RelayCommand(CanExecute = nameof(CanConnect))]
-        private void Connect()
+        [RelayCommand(CanExecute = nameof(CanConnectDisconnect))]
+        private void ConnectDisconnect()
         {
-            if (!_serialService.Connect(SelectedPort))
+            if (!IsConnected)
             {
-                MessageBox.Show("Falha ao conectar à porta serial.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (string.IsNullOrEmpty(SelectedPort))
+                    return;
+                if (!_serialService.Connect(SelectedPort))
+                {
+                    MessageBox.Show("Falha ao conectar à porta serial.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                _serialService.Disconnect();
             }
         }
-        private bool CanConnect() => !IsConnected && !string.IsNullOrEmpty(SelectedPort);
-
-
-        [RelayCommand(CanExecute = nameof(CanDisconnect))]
-        private void Disconnect()
+        private bool CanConnectDisconnect()
         {
-            _serialService.Disconnect();
+            if (!IsConnected)
+            {
+                return !string.IsNullOrWhiteSpace(SelectedPort);
+            }
+            return true;
         }
-        private bool CanDisconnect() => IsConnected;
-
 
         [RelayCommand(CanExecute = nameof(CanStartMeasurement))]
         private async void StartMeasurement()
@@ -104,14 +133,14 @@ namespace Intron.LaserMonitor.ViewModels
         private void RefreshPorts()
         {
             AvailablePorts.Clear();
-            var ports = _serialService.GetAvailableSerialPorts();
-            if (ports != null)
+            foreach (var port in _serialService.GetAvailableSerialPorts())
             {
-                foreach (var port in ports)
-                {
-                    AvailablePorts.Add(port);
-                }
+                AvailablePorts.Add(port);
             }
+
+            SelectedPort = string.IsNullOrWhiteSpace(SelectedPort)
+                ? AvailablePorts.FirstOrDefault()!
+                : SelectedPort;
         }
 
         private void OnConnected(object sender, EventArgs e) => IsConnected = true;

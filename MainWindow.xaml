@@ -26,12 +26,13 @@
                 <ComboBox ItemsSource="{Binding AvailablePorts}"
                           SelectedItem="{Binding SelectedPort}"
                           Width="120"
+                          DropDownOpened="ComboBox_DropDownOpened"
                           IsEnabled="{Binding IsDisconnected}"/>
 
-                <Button Content="Recarregar" Command="{Binding RefreshPortsCommand}" Margin="5,0,0,0" ToolTip="Atualizar lista de portas"/>
-
-                <Button Content="Conectar" Command="{Binding ConnectCommand}" Margin="10,0,0,0" Width="80"/>
-                <Button Content="Desconectar" Command="{Binding DisconnectCommand}" Margin="5,0,0,0" Width="80"/>
+                <Button Content="{Binding ConnectText}"
+                        Command="{Binding ConnectDisconnectCommand}"
+                        Margin="10,0,0,0"
+                        Width="80" />
                 <Button Content="Iniciar Medição" Command="{Binding StartMeasurementCommand}" Margin="30,0,0,0" Background="#FFC7E8B5"/>
                 <Button Content="Parar Medição" Command="{Binding StopMeasurementCommand}" Margin="5,0,0,0" Background="#FFE8B5B5"/>
                 <Button Content="Exportar Excel" Command="{Binding ExportToExcelCommand}" Margin="30,0,0,0" />
