@@ -17,7 +17,7 @@ namespace Intron.LaserMonitor.Services
                 var worksheet = package.Workbook.Worksheets.Add("Medições Laser");
 
                 worksheet.Cells[1, 1].Value = "Timestamp";
-                worksheet.Cells[1, 2].Value = "Distância (m)";
+                worksheet.Cells[1, 2].Value = "Distância (mm)";
                 worksheet.Cells[1, 1, 1, 2].Style.Font.Bold = true;
 
                 int row = 2;

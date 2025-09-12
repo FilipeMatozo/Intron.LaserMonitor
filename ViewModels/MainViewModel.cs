@@ -188,7 +188,7 @@ namespace Intron.LaserMonitor.ViewModels
             PlotModel.Axes.Add(new LinearAxis
             {
                 Position = AxisPosition.Left,
-                Title = "Distância (m)",
+                Title = "Distância (mm)",
                 Minimum = 0,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot
@@ -196,7 +196,7 @@ namespace Intron.LaserMonitor.ViewModels
 
             var lineSeries = new LineSeries
             {
-                Title = "Distância",
+                Title = "Distância (mm)",
                 StrokeThickness = 2,
                 MarkerType = MarkerType.None,
                 ItemsSource = PlotPoints,
@@ -218,7 +218,6 @@ namespace Intron.LaserMonitor.ViewModels
 
                     if (double.TryParse(distanceStr, out var distance))
                     {
-                        distance = distance / 1000;
                         var measurement = new Measurement
                         {
                             Timestamp = DateTime.Now,
@@ -229,7 +228,7 @@ namespace Intron.LaserMonitor.ViewModels
                         PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), distance));
                         PlotModel.InvalidatePlot(true);
 
-                        CurrentDistance = $"{distance:F3}";
+                        CurrentDistance = $"{distance}mm";
                         ExportToExcelCommand.NotifyCanExecuteChanged();
                     }
                 }
