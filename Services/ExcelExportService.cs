@@ -18,6 +18,7 @@ namespace Intron.LaserMonitor.Services
 
                 worksheet.Cells[1, 1].Value = "Timestamp";
                 worksheet.Cells[1, 2].Value = "Distância (mm)";
+                worksheet.Cells[1, 3].Value = "Distância Absoluta (mm)";
                 worksheet.Cells[1, 1, 1, 2].Style.Font.Bold = true;
 
                 int row = 2;
@@ -26,6 +27,7 @@ namespace Intron.LaserMonitor.Services
                     worksheet.Cells[row, 1].Value = point.Timestamp;
                     worksheet.Cells[row, 1].Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss.000";
                     worksheet.Cells[row, 2].Value = point.Distance;
+                    worksheet.Cells[row, 3].Value = point.DistanceAbsolute;
                     row++;
                 }
 

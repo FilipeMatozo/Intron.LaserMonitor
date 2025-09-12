@@ -37,6 +37,7 @@ namespace Intron.LaserMonitor.ViewModels
         [NotifyPropertyChangedFor(nameof(ConnectText))]
         [NotifyCanExecuteChangedFor(nameof(StartMeasurementCommand))]
         [NotifyCanExecuteChangedFor(nameof(StopMeasurementCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ZeroOffsetCommand))]
         private bool _isConnected = false;
 
         [ObservableProperty]
@@ -50,7 +51,9 @@ namespace Intron.LaserMonitor.ViewModels
             get => !string.IsNullOrWhiteSpace(SelectedPort);
         }
         public PlotModel PlotModel { get; private set; }
-        public ObservableCollection<DataPoint> PlotPoints { get; private set; } = new();
+        public List<DataPoint> PlotPoints { get; private set; } = new();
+
+        private double _zeroOffset = 0;
 
         public MainViewModel(ISerialService serialService, IExcelExportService excelExportService)
         {
@@ -129,6 +132,15 @@ namespace Intron.LaserMonitor.ViewModels
         }
         private bool CanStopMeasurement() => IsConnected;
 
+        [RelayCommand(CanExecute = nameof(CanZeroOffset))]
+        private void ZeroOffset()
+        {
+            _zeroOffset = _allMeasurements.Last().DistanceAbsolute;
+            _allMeasurements.Clear();
+            PlotPoints.Clear();
+        }
+        private bool CanZeroOffset() => IsConnected;
+
         [RelayCommand]
         private void RefreshPorts()
         {
@@ -180,7 +192,7 @@ namespace Intron.LaserMonitor.ViewModels
             {
                 Position = AxisPosition.Bottom,
                 Title = "Tempo",
-                StringFormat = "HH:mm:ss",
+                StringFormat = "HH:mm:ss.fff",
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot
             });
@@ -189,7 +201,6 @@ namespace Intron.LaserMonitor.ViewModels
             {
                 Position = AxisPosition.Left,
                 Title = "Distância (mm)",
-                Minimum = 0,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot
             });
@@ -210,41 +221,47 @@ namespace Intron.LaserMonitor.ViewModels
         private void OnDataReceived(object sender, Models.Events.DataReceivedEventArgs dataReceivedEventArgs)
         {
             var data = dataReceivedEventArgs.Data;
-            Application.Current.Dispatcher.Invoke(() =>
+            
+            if (data.StartsWith("D=") && data.EndsWith("m"))
             {
-                if (data.StartsWith("D=") && data.EndsWith("m"))
-                {
-                    string distanceStr = data.Replace("D=", "").Replace("m", "").Trim();
+                string distanceStr = data.Replace("D=", "").Replace("m", "").Trim();
 
-                    if (double.TryParse(distanceStr, out var distance))
-                    {
-                        var measurement = new Measurement
-                        {
-                            Timestamp = DateTime.Now,
-                            Distance = distance
-                        };
-                        _allMeasurements.Add(measurement);
-
-                        PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), distance));
-                        PlotModel.InvalidatePlot(true);
-
-                        CurrentDistance = $"{distance}mm";
-                        ExportToExcelCommand.NotifyCanExecuteChanged();
-                    }
-                }
-                else if (data.StartsWith("E="))
+                if (double.TryParse(distanceStr, out var distance))
                 {
                     var measurement = new Measurement
                     {
                         Timestamp = DateTime.Now,
-                        Distance = 0
+                        Distance = distance-_zeroOffset,
+                        DistanceAbsolute = distance
                     };
                     _allMeasurements.Add(measurement);
-                    PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+                    });
                     PlotModel.InvalidatePlot(true);
-                    CurrentDistance = "N/A";
+
+                    CurrentDistance = $"{measurement.Distance}mm | {measurement.DistanceAbsolute}mm";
+                    ExportToExcelCommand.NotifyCanExecuteChanged();
                 }
-            });
+            }
+            else if (data.StartsWith("E="))
+            {
+                var measurement = new Measurement
+                {
+                    Timestamp = DateTime.Now,
+                    Distance = 0,
+                    DistanceAbsolute = 0
+                };
+                _allMeasurements.Add(measurement);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+                });
+                PlotModel.InvalidatePlot(true);
+                CurrentDistance = "N/A";
+            }
         }
     }
 }
