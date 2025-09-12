@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="clr-namespace:Intron.LaserMonitor.Views"
     xmlns:vm="clr-namespace:Intron.LaserMonitor.ViewModels"
-    Title="ShellWindow"
+    Title="Intron Laser Monitor"
     Width="1024"
     Height="600"
     mc:Ignorable="d">
