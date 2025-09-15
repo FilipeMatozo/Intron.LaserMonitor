@@ -26,10 +26,21 @@ namespace Intron.LaserMonitor.ViewModels
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ConnectText))]
         [NotifyPropertyChangedFor(nameof(IsConnectedText))]
-        [NotifyCanExecuteChangedFor(nameof(StartMeasurementCommand))]
-        [NotifyCanExecuteChangedFor(nameof(StopMeasurementCommand))]
+        [NotifyPropertyChangedFor(nameof(StartStopText))]
+        [NotifyCanExecuteChangedFor(nameof(StartStopMeasurementCommand))]
         [NotifyCanExecuteChangedFor(nameof(ZeroOffsetCommand))]
         private bool _isConnected = false;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(StartStopText))]
+        [NotifyCanExecuteChangedFor(nameof(StartStopMeasurementCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ZeroOffsetCommand))]
+        private bool _isMeasuring = false;
+
+        public string StartStopText
+        {
+            get => !IsMeasuring ? "Iniciar" : "Interromper";
+        }
 
         [ObservableProperty]
         private string _currentDistance = "N/A";
@@ -64,6 +75,7 @@ namespace Intron.LaserMonitor.ViewModels
             _serialService.DataReceived -= OnDataReceived;
             _serialService.Connected -= OnConnected;
             _serialService.Disconnected -= OnDisconnected;
+            _serialService.OnMeasurementStateChanged -= _serialService_OnMeasurementStateChanged;
         }
 
         private void SubscribeEvents()
@@ -71,28 +83,31 @@ namespace Intron.LaserMonitor.ViewModels
             _serialService.DataReceived += OnDataReceived;
             _serialService.Connected += OnConnected;
             _serialService.Disconnected += OnDisconnected;
+            _serialService.OnMeasurementStateChanged += _serialService_OnMeasurementStateChanged;
         }
 
-        [RelayCommand(CanExecute = nameof(CanStartMeasurement))]
-        private async void StartMeasurement()
+        private void _serialService_OnMeasurementStateChanged(object? sender, bool isMeasuring) => IsMeasuring = isMeasuring;
+
+        [RelayCommand(CanExecute = nameof(CanStartStopMeasurement))]
+        private async void StartStopMeasurement()
         {
-            _allMeasurements.Clear();
-            PlotPoints.Clear();
-            PlotModel.InvalidatePlot(true);
-            CurrentDistance = "Iniciando...";
+            if (!IsMeasuring)
+            {
+                _allMeasurements.Clear();
+                PlotPoints.Clear();
+                PlotModel.InvalidatePlot(true);
+                CurrentDistance = "Iniciando...";
 
-            await _serialService.StartMeasurement();
+                await _serialService.StartMeasurement();
+            }
+            else
+            {
+                await _serialService.StopMeasurement();
+                CurrentDistance = "Medição parada.";
+            }
         }
-        private bool CanStartMeasurement() => IsConnected;
+        private bool CanStartStopMeasurement() => IsConnected;
 
-
-        [RelayCommand(CanExecute = nameof(CanStopMeasurement))]
-        private async void StopMeasurement()
-        {
-            await _serialService.StopMeasurement();
-            CurrentDistance = "Medição parada.";
-        }
-        private bool CanStopMeasurement() => IsConnected;
 
         [RelayCommand(CanExecute = nameof(CanZeroOffset))]
         private void ZeroOffset()
@@ -101,7 +116,7 @@ namespace Intron.LaserMonitor.ViewModels
             _allMeasurements.Clear();
             PlotPoints.Clear();
         }
-        private bool CanZeroOffset() => IsConnected;
+        private bool CanZeroOffset() => IsConnected && IsMeasuring;
 
         private void OnConnected(object sender, EventArgs e) => IsConnected = true;
 

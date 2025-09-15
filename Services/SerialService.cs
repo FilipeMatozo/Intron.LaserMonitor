@@ -20,7 +20,8 @@ namespace Intron.LaserMonitor.Services
         }
 
         public event EventHandler Connected;   
-        public event EventHandler Disconnected;   
+        public event EventHandler Disconnected;
+        public event EventHandler<bool> OnMeasurementStateChanged;
         public event EventHandler<Models.Events.DataReceivedEventArgs> DataReceived;   
 
         public IEnumerable<string> GetAvailableSerialPorts()
@@ -80,7 +81,7 @@ namespace Intron.LaserMonitor.Services
             try
             {
                 _serialPort.DataReceived -= OnDataReceived;
-                _serialPort.Close();                
+                _serialPort.Close();
             }
            
             catch (Exception ex)
@@ -92,17 +93,20 @@ namespace Intron.LaserMonitor.Services
             {
                 _serialPort.Dispose();
                 Disconnected?.Invoke(this, new());
+                OnMeasurementStateChanged(this, false);
             }
         }
 
         public async Task StartMeasurement()
         {
             await SendCommandAsync("iFACM");
+            OnMeasurementStateChanged(this, true);
         }
 
         public async Task StopMeasurement()
         {
             await SendCommandAsync("iHALT");
+            OnMeasurementStateChanged(this, false);
         }
 
         public async Task SendCommandAsync(string command)
