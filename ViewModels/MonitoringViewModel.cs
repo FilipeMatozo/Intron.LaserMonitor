@@ -37,6 +37,8 @@ namespace Intron.LaserMonitor.ViewModels
         [NotifyCanExecuteChangedFor(nameof(ZeroOffsetCommand))]
         private bool _isMeasuring = false;
 
+        private CancellationTokenSource cancellationTokenSource = new();
+
         public string StartStopText
         {
             get => !IsMeasuring ? "Iniciar" : "Interromper";
@@ -63,7 +65,8 @@ namespace Intron.LaserMonitor.ViewModels
         {
             _serialService = serialService;
             _excelService = excelExportService;
-
+            IsConnected = _serialService.IsConnected;
+            
             SetupPlotModel();
             SubscribeEvents();
         }
@@ -93,16 +96,17 @@ namespace Intron.LaserMonitor.ViewModels
         {
             if (!IsMeasuring)
             {
+                cancellationTokenSource = new();
                 _allMeasurements.Clear();
                 PlotPoints.Clear();
                 PlotModel.InvalidatePlot(true);
                 CurrentDistance = "Iniciando...";
 
-                await _serialService.StartMeasurement();
+                await _serialService.StartMeasurement(cancellationTokenSource.Token);
             }
             else
             {
-                await _serialService.StopMeasurement();
+                await _serialService.StopMeasurement(cancellationTokenSource.Token);
                 CurrentDistance = "Medição parada.";
             }
         }
@@ -200,11 +204,12 @@ namespace Intron.LaserMonitor.ViewModels
                     };
                     _allMeasurements.Add(measurement);
 
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
-                        ExportToExcelCommand.NotifyCanExecuteChanged();
-                    });
+                    if (Application.Current is not null)                    
+                        Application.Current?.Dispatcher.Invoke(() =>
+                        {
+                            PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+                            ExportToExcelCommand.NotifyCanExecuteChanged();
+                        });
                     PlotModel.InvalidatePlot(true);
 
                     CurrentDistance = $"Relativa: {measurement.Distance}mm | Absoluta: {measurement.DistanceAbsolute}mm";

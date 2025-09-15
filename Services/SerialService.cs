@@ -33,7 +33,7 @@ namespace Intron.LaserMonitor.Services
         {
             App.Current.Exit += (s, e) => Dispose();
         }
-
+        
         public IEnumerable<string> GetAvailableSerialPorts()
         {
             return SerialPort.GetPortNames();
@@ -137,19 +137,19 @@ namespace Intron.LaserMonitor.Services
             }
         }
 
-        public async Task StartMeasurement()
+        public async Task StartMeasurement(CancellationToken cancellationToken)
         {
-            await SendCommandAsync("iFACM");
+            await SendCommandAsync("iFACM", cancellationToken);
             OnMeasurementStateChanged(this, true);
         }
 
-        public async Task StopMeasurement()
+        public async Task StopMeasurement(CancellationToken cancellationToken)
         {
-            await SendCommandAsync("iHALT");
+            await SendCommandAsync("iHALT", cancellationToken);
             OnMeasurementStateChanged(this, false);
         }
 
-        public async Task SendCommandAsync(string command)
+        public async Task SendCommandAsync(string command, CancellationToken cancellationToken)
         {
             if (_serialPort == null || !_serialPort.IsOpen)
                 return;
@@ -158,8 +158,7 @@ namespace Intron.LaserMonitor.Services
             {
                 string commandToSend = $"{command}\r\n";
 
-                await _serialPort.BaseStream.WriteAsync(
-                    System.Text.Encoding.ASCII.GetBytes(commandToSend), 0, commandToSend.Length);
+                await _serialPort.BaseStream.WriteAsync(Encoding.ASCII.GetBytes(commandToSend).AsMemory(0, commandToSend.Length), cancellationToken);
             }
             catch (Exception ex)
             {

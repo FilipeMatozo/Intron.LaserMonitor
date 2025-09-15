@@ -18,6 +18,6 @@ public interface ISerialService : IDisposable
     bool Connect(string portName, int baudRate = 115200);
     void Disconnect();
     IEnumerable<string> GetAvailableSerialPorts();
-    Task StartMeasurement();
-    Task StopMeasurement();
+    Task StartMeasurement(CancellationToken cancellationToken);
+    Task StopMeasurement(CancellationToken cancellationToken);
 }

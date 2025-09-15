@@ -133,9 +133,10 @@ public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a clas
         return true;
     }
     #endregion
-    private void OpenMainWindowCommand()
+    [RelayCommand]
+    private void OpenMainWindow()
     {
-
+        //CurrentUserControl = new();
     }
 
     [RelayCommand]
