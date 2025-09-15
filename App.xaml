@@ -10,8 +10,8 @@
             <!--<fx:InvertEffect x:Key="InvertOnHover" x:Shared="False" />-->
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Themes/IntronLightTheme.xaml" />
-            </ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Styles/Buttons.xaml" />
+            </ResourceDictionary.MergedDictionaries>            
         </ResourceDictionary>
-
     </Application.Resources>
 </Application>

@@ -27,35 +27,28 @@
                 CornerRadius="5">
             <StackPanel Orientation="Horizontal"
                         VerticalAlignment="Center">
-                <TextBlock Text="Porta COM:"
+                <TextBlock Text="Comandos:"
                            VerticalAlignment="Center"
                            Margin="0,0,5,0"
                            FontWeight="SemiBold" />
-
-                <ComboBox ItemsSource="{Binding AvailablePorts}"
-                          SelectedItem="{Binding SelectedPort}"
-                          Width="120"
-                          DropDownOpened="ComboBox_DropDownOpened"
-                          IsEnabled="{Binding IsDisconnected}" />
-
-                <Button Content="{Binding ConnectText}"
-                        Command="{Binding ConnectDisconnectCommand}"
-                        Margin="10,0,0,0"
-                        Width="80" />
-                <Button Content="Iniciar Medição"
-                        Command="{Binding StartMeasurementCommand}"
-                        Margin="30,0,0,0"
-                        Background="#FFC7E8B5" />
-                <Button Content="Parar Medição"
-                        Command="{Binding StopMeasurementCommand}"
-                        Margin="5,0,0,0"
-                        Background="#FFE8B5B5" />
-                <Button Content="Zerar Medição"
+                <Button x:Name="StartStopButton"
+                        Width="100"
+                        Height="30"
+                        Command="{Binding StartStopCommand}"
+                        Content="{Binding StartStopText}"
+                        Margin="5, 0, 5, 0" />
+                <Button x:Name="SetZeroButton"
+                        Width="100"
+                        Height="30"
+                        Margin="5, 0, 5, 0"
                         Command="{Binding ZeroOffsetCommand}"
-                        Margin="5,0,0,0" />
-                <Button Content="Exportar Excel"
+                        Content="Zerar Medição" />
+                <Button x:Name="ExportButton"
+                        Width="100"
+                        Margin="5, 0, 0, 0"
+                        Height="30"
                         Command="{Binding ExportToExcelCommand}"
-                        Margin="30,0,0,0" />
+                        Content="Exportar Excel" />
             </StackPanel>
         </Border>
 

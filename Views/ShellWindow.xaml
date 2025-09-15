@@ -221,7 +221,7 @@
         <Grid
             x:Name="TopMenu"
             Grid.Row="1"
-            Grid.Column="1"
+            Grid.Column="0"
             Grid.ColumnSpan="2"
             Background="{StaticResource White}"
             Grid.ZIndex="2">
@@ -283,7 +283,7 @@
                     </Grid>
                 </DockPanel>
 
-                <DockPanel HorizontalAlignment="Right">
+                <DockPanel HorizontalAlignment="Left">
                     <!--<DockPanel Margin="0, 0, 6, 0">
                         <TextBlock Text="Console : "
                                    FontFamily="{StaticResource Inter}"
@@ -308,15 +308,15 @@
                         </Border>
                     </DockPanel>-->
                     <DockPanel x:Name="Reconnection" Margin="0,0,10,0">
-                        <ComboBox Width="100" 
+                        <ComboBox Width="100"
                                   Height="30"
+                                  Margin="15, 0, 10, 0"
                                   Cursor="Hand"
                                   Text="Porta COM">
                             <ComboBoxItem Content="COM1" />
                             <ComboBoxItem Content="TEST2" />
                             <ComboBoxItem Content="TESTE3" />
                             <ComboBoxItem Content="TEST4" />
-
                             <ComboBox.Style>
                                 <Style TargetType="{x:Type ComboBox}">
                                     <Setter Property="Background"
@@ -339,9 +339,10 @@
                                                     <!-- BOTÃO QUE OCUPA TUDO, MAS TRANSPARENTE -->
                                                     <ToggleButton x:Name="ToggleButton"
                                                                   Background="Transparent"
+                                                                  BorderBrush="Transparent"
                                                                   BorderThickness="0"
                                                                   IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                                                  ClickMode="Press"
+                                                                  ClickMode="Press"                                                                  
                                                                   Focusable="False">
                                                         <Grid>
                                                             <!-- Texto do selecionado -->
@@ -357,7 +358,7 @@
                                                             <TextBlock x:Name="Placeholder"
                                                                        Margin="6,0,25,0"
                                                                        VerticalAlignment="Center"
-                                                                       Foreground="{DynamicResource BorderGray}"
+                                                                       Foreground="{DynamicResource Black}"
                                                                        Text="{TemplateBinding Text}"
                                                                        Visibility="Collapsed"
                                                                        IsHitTestVisible="False" />
@@ -411,161 +412,11 @@
                                 </Style>
                             </ComboBox.Style>
                         </ComboBox>
-
-
-
-
-                        <Button
-                            x:Name="ReconnectionButton"
-                            Width="100"
-                            Height="30"
-                            BorderBrush="{DynamicResource White}"
-                            Command="{Binding ConnectCommand}"
-                            Content="{Binding ConnectButtonText}"
-                            Cursor="Hand">
-
-                            <Button.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="6" />
-                                </Style>
-                            </Button.Resources>
-
-                            <Button.Style>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type Button}">
-                                                <Border
-                                                    Background="{TemplateBinding Background}"
-                                                    BorderBrush="{DynamicResource BorderGray}"
-                                                    BorderThickness="1">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource White}" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button
-                            x:Name="StartStopButton"
-                            Width="100"
-                            Height="30"
-                            BorderBrush="{DynamicResource White}"
-                            Command="{Binding StartStopCommand}"
-                            Content="{Binding StartStopText}"
-                            Cursor="Hand">
-
-                            <Button.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="6" />
-                                </Style>
-                            </Button.Resources>
-
-                            <Button.Style>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type Button}">
-                                                <Border
-                                                    Background="{TemplateBinding Background}"
-                                                    BorderBrush="{DynamicResource BorderGray}"
-                                                    BorderThickness="1">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource White}" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button
-                            x:Name="SetZeroButton"
-                            Width="100"
-                            Height="30"
-                            BorderBrush="{DynamicResource White}"
-                            Command="{Binding SetZeroCommand}"
-                            Content="Zerar Medição"
-                            Cursor="Hand">
-
-                            <Button.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="6" />
-                                </Style>
-                            </Button.Resources>
-
-                            <Button.Style>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type Button}">
-                                                <Border
-                                                    Background="{TemplateBinding Background}"
-                                                    BorderBrush="{DynamicResource BorderGray}"
-                                                    BorderThickness="1">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource White}" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button
-                            x:Name="ExportButton"
-                            Width="100"
-                            Height="30"
-                            BorderBrush="{DynamicResource White}"
-                            Command="{Binding ConnectCommand}"
-                            Content="Exportar Excel"
-                            Cursor="Hand">
-
-                            <Button.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="6" />
-                                </Style>
-                            </Button.Resources>
-
-                            <Button.Style>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type Button}">
-                                                <Border
-                                                    Background="{TemplateBinding Background}"
-                                                    BorderBrush="{DynamicResource BorderGray}"
-                                                    BorderThickness="1">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource White}" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
+                        <Button x:Name="ReconnectionButton"
+                                Width="100"
+                                Height="30"
+                                Command="{Binding ConnectCommand}"
+                                Content="{Binding ConnectButtonText}">
                         </Button>
                     </DockPanel>
                 </DockPanel>
