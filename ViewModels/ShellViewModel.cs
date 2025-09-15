@@ -9,26 +9,32 @@ using System.Windows.Media;
 
 namespace Intron.LaserMonitor.ViewModels;
 
-public partial class ShellViewModel : ObservableRecipient
+public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a classe IDisposable e desinscrever os eventos no dispose.
 {
+    #region SerialProps
     private readonly ISerialService _serialService;
+    [NotifyPropertyChangedFor(nameof(DeviceConnectionText))]
+    [NotifyPropertyChangedFor(nameof(DeviceConnectionImage))]
+    [NotifyPropertyChangedFor(nameof(ConnectButtonText))]
+    [NotifyPropertyChangedFor(nameof(EllipseConnectionColor))]
+    [NotifyPropertyChangedFor(nameof(IsSerialDisconnected))]
+    [ObservableProperty]
+    private bool isSerialConnected = false;
 
-    [ObservableProperty] private Visibility logoCloseMenu = Visibility.Visible;
-    [ObservableProperty] private Visibility logoOpenMenu = Visibility.Collapsed;
-    [ObservableProperty] private ObservableCollection<MenuItemModel> menuItemModelList = new();
-    [ObservableProperty] private bool isMenuItemListOpen;
-    [ObservableProperty] Thickness deviceConnectionMargin;
-    [ObservableProperty] private object currentUserControl;
-    [ObservableProperty] bool isMonitoring = false;
-    public string StartStopText
+    public bool IsSerialDisconnected
     {
-        get => IsMonitoring ? "Stop" : "Start";
+        get => !IsSerialConnected;
     }
+
+    [ObservableProperty] private ObservableCollection<string> _availablePorts = new();
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ConnectDisconnectCommand))]
+    private string _selectedPort = string.Empty;
     public string ConnectButtonText
     {
-        get => IsSerialConnected ? "Disconnect" : "Connect";
+        get => IsSerialConnected ? "Desconectar" : "Conectar";
     }
-
     public SolidColorBrush EllipseConnectionColor
     {
         get => IsSerialConnected
@@ -37,26 +43,96 @@ public partial class ShellViewModel : ObservableRecipient
     }
     public string DeviceConnectionImage
     {
-        get => IsSerialConnected 
-            ? "/Assets/Images/icons8-conectado-50.png" 
+        get => IsSerialConnected
+            ? "/Assets/Images/icons8-conectado-50.png"
             : " /Assets/Images/icons8-desconectado-50.png";
     }
     public string DeviceConnectionText
     {
         get => IsSerialConnected ? "Dispositivo Conectado" : "Dispositivo Desconectado";
     }
+    #endregion
 
-    [NotifyPropertyChangedFor(nameof(DeviceConnectionText))]
-    [NotifyPropertyChangedFor(nameof(DeviceConnectionImage))]
-    [NotifyPropertyChangedFor(nameof(ConnectButtonText))]
-    [NotifyPropertyChangedFor(nameof(EllipseConnectionColor))]
-    [ObservableProperty] private bool isSerialConnected = false;
-
+    #region OtherProps
+    [ObservableProperty] private Visibility logoCloseMenu = Visibility.Visible;
+    [ObservableProperty] private Visibility logoOpenMenu = Visibility.Collapsed;
+    [ObservableProperty] private ObservableCollection<MenuItemModel> menuItemModelList = new();
+    [ObservableProperty] private bool isMenuItemListOpen;
+    [ObservableProperty] Thickness deviceConnectionMargin;
+    [ObservableProperty] private object currentUserControl;
+    #endregion
     public ShellViewModel(ISerialService serialService)
     {
         _serialService = serialService;
+
+
+        LoadComboboxes();
+        SubscribeEvents();
+    }
+    #region Eventos
+    private void UnsubscribeEvents()
+    {
+        _serialService.Connected -= OnConnected;
+        _serialService.Disconnected -= OnDisconnected;
     }
 
+    private void SubscribeEvents()
+    {
+        _serialService.Connected += OnConnected;
+        _serialService.Disconnected += OnDisconnected;
+    }
+
+    private void OnDisconnected(object? sender, EventArgs e) => IsSerialConnected = false;
+
+    private void OnConnected(object? sender, EventArgs e) => IsSerialConnected = true;
+    #endregion
+
+    #region SerialMethods
+    private void LoadComboboxes()
+    {
+        RefreshPorts();
+        SelectedPort = AvailablePorts.FirstOrDefault()!;
+    }
+
+    [RelayCommand]
+    private void RefreshPorts()
+    {
+        AvailablePorts.Clear();
+        foreach (var port in _serialService.GetAvailableSerialPorts())
+        {
+            AvailablePorts.Add(port);
+        }
+
+        SelectedPort = string.IsNullOrWhiteSpace(SelectedPort)
+            ? AvailablePorts.FirstOrDefault()!
+            : SelectedPort;
+    }
+    [RelayCommand(CanExecute = nameof(CanConnectDisconnect))]
+    private void ConnectDisconnect()
+    {
+        if (!IsSerialConnected)
+        {
+            if (string.IsNullOrEmpty(SelectedPort))
+                return;
+            if (!_serialService.Connect(SelectedPort))
+            {
+                MessageBox.Show("Falha ao conectar à porta serial.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        else
+        {
+            _serialService.Disconnect();
+        }
+    }
+    private bool CanConnectDisconnect()
+    {
+        if (!IsSerialConnected)
+        {
+            return !string.IsNullOrWhiteSpace(SelectedPort);
+        }
+        return true;
+    }
+    #endregion
     private void OpenMainWindowCommand()
     {
 
@@ -91,21 +167,7 @@ public partial class ShellViewModel : ObservableRecipient
             LogoOpenMenu = Visibility.Collapsed;
         }
     }
-    [RelayCommand]
-    private void Connect()
-    {
 
-    }
-    [RelayCommand]
-    private void StartStop()
-    {
-
-    }
-    [RelayCommand]
-    private void SetZero()
-    {
-
-    }
     private void UpdateMenuItemModelList()
     {
         MenuItemModelList.Add(new MenuItemModel("Real Time Monitoring", "/Assets/Images/icons8-grafico-24.png", "/Assets/Images/icons8-grafico-24-white.png", (RelayCommand)MonitoringViewCommand));

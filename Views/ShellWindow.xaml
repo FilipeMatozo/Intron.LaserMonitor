@@ -312,11 +312,11 @@
                                   Height="30"
                                   Margin="15, 0, 10, 0"
                                   Cursor="Hand"
+                                  ItemsSource="{Binding AvailablePorts}"
+                                  SelectedItem="{Binding SelectedPort}"
+                                  IsEnabled="{Binding IsSerialDisconnected}"
+                                  DropDownOpened="ComboBox_DropDownOpened"
                                   Text="Porta COM">
-                            <ComboBoxItem Content="COM1" />
-                            <ComboBoxItem Content="TEST2" />
-                            <ComboBoxItem Content="TESTE3" />
-                            <ComboBoxItem Content="TEST4" />
                             <ComboBox.Style>
                                 <Style TargetType="{x:Type ComboBox}">
                                     <Setter Property="Background"
@@ -415,7 +415,7 @@
                         <Button x:Name="ReconnectionButton"
                                 Width="100"
                                 Height="30"
-                                Command="{Binding ConnectCommand}"
+                                Command="{Binding ConnectDisconnectCommand}"
                                 Content="{Binding ConnectButtonText}">
                         </Button>
                     </DockPanel>

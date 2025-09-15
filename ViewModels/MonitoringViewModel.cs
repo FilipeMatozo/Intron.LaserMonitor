@@ -24,14 +24,6 @@ namespace Intron.LaserMonitor.ViewModels
         private readonly List<Measurement> _allMeasurements = new();
 
         [ObservableProperty]
-        private ObservableCollection<string> _availablePorts = new();
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ConnectBtnEnabled))]
-        [NotifyCanExecuteChangedFor(nameof(ConnectDisconnectCommand))]
-        private string _selectedPort = string.Empty;
-
-        [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ConnectText))]
         [NotifyPropertyChangedFor(nameof(IsConnectedText))]
         [NotifyCanExecuteChangedFor(nameof(StartMeasurementCommand))]
@@ -50,10 +42,7 @@ namespace Intron.LaserMonitor.ViewModels
         {
             get => IsConnected ? "Conectado" : "Desconectado";
         }
-        public bool ConnectBtnEnabled
-        {
-            get => !string.IsNullOrWhiteSpace(SelectedPort);
-        }
+
         public PlotModel PlotModel { get; private set; }
         public List<DataPoint> PlotPoints { get; private set; } = new();
 
@@ -65,15 +54,10 @@ namespace Intron.LaserMonitor.ViewModels
             _excelService = excelExportService;
 
             SetupPlotModel();
-            LoadComboboxes();
             SubscribeEvents();
         }
 
-        private void LoadComboboxes()
-        {
-            RefreshPorts();
-            SelectedPort = AvailablePorts.FirstOrDefault()!;
-        }
+
 
         private void UnsubscribeEvents()
         {
@@ -87,32 +71,6 @@ namespace Intron.LaserMonitor.ViewModels
             _serialService.DataReceived += OnDataReceived;
             _serialService.Connected += OnConnected;
             _serialService.Disconnected += OnDisconnected;
-        }
-
-        [RelayCommand(CanExecute = nameof(CanConnectDisconnect))]
-        private void ConnectDisconnect()
-        {
-            if (!IsConnected)
-            {
-                if (string.IsNullOrEmpty(SelectedPort))
-                    return;
-                if (!_serialService.Connect(SelectedPort))
-                {
-                    MessageBox.Show("Falha ao conectar à porta serial.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            else
-            {
-                _serialService.Disconnect();
-            }
-        }
-        private bool CanConnectDisconnect()
-        {
-            if (!IsConnected)
-            {
-                return !string.IsNullOrWhiteSpace(SelectedPort);
-            }
-            return true;
         }
 
         [RelayCommand(CanExecute = nameof(CanStartMeasurement))]
@@ -144,20 +102,6 @@ namespace Intron.LaserMonitor.ViewModels
             PlotPoints.Clear();
         }
         private bool CanZeroOffset() => IsConnected;
-
-        [RelayCommand]
-        private void RefreshPorts()
-        {
-            AvailablePorts.Clear();
-            foreach (var port in _serialService.GetAvailableSerialPorts())
-            {
-                AvailablePorts.Add(port);
-            }
-
-            SelectedPort = string.IsNullOrWhiteSpace(SelectedPort)
-                ? AvailablePorts.FirstOrDefault()!
-                : SelectedPort;
-        }
 
         private void OnConnected(object sender, EventArgs e) => IsConnected = true;
 
