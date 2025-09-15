@@ -8,6 +8,7 @@ public interface ISerialService
     event EventHandler Disconnected;
     event EventHandler<Models.Events.DataReceivedEventArgs> DataReceived;
 
+    bool IsConnected { get; }
     bool Connect(string portName, int baudRate = 115200);
     void Disconnect();
     IEnumerable<string> GetAvailableSerialPorts();

@@ -14,6 +14,11 @@ namespace Intron.LaserMonitor.Services
     {
         private SerialPort _serialPort;
 
+        public bool IsConnected
+        {
+            get => _serialPort.IsOpen;
+        }
+
         public event EventHandler Connected;   
         public event EventHandler Disconnected;   
         public event EventHandler<Models.Events.DataReceivedEventArgs> DataReceived;   

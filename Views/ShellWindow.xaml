@@ -17,7 +17,7 @@
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:MonitoringViewModel}">
-            <views:MonitoringView Margin="100, 0" />
+            <views:MonitoringView />
         </DataTemplate>
         <!--<fx:InvertChromaKeyEffect
             x:Key="InvertKeyBlack"
@@ -63,14 +63,19 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="190" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="64" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <Grid
             x:Name="SideMenu"
-            Grid.Column="0"
             Grid.Row="1"
             Grid.RowSpan="2"
+            Grid.Column="0"
             Width="86"
             HorizontalAlignment="Left"
             Background="{DynamicResource White}"
@@ -154,8 +159,8 @@
                                                                         Height="18"
                                                                         Margin="12,0,0,0"
                                                                         VerticalAlignment="Center"
-                                                                           CacheMode="BitmapCache"
-                                                                           gif:ImageBehavior.AnimatedSource="{Binding ImagePath}" />
+                                                                        gif:ImageBehavior.AnimatedSource="{Binding ImagePath}"
+                                                                        CacheMode="BitmapCache" />
 
                                                                     <TextBlock
                                                                         Grid.Column="1"
@@ -213,7 +218,365 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <ContentControl HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch" Content="{Binding CurrentUserControl}" />
+        <Grid
+            x:Name="TopMenu"
+            Grid.Row="1"
+            Grid.Column="1"
+            Grid.ColumnSpan="2"
+            Background="{StaticResource White}"
+            Grid.ZIndex="2">
+
+            <Border BorderBrush="{DynamicResource BorderGray}" BorderThickness="0,0,0,1.2" />
+
+            <DockPanel x:Name="TopBar" Margin="96,0,0,0">
+
+                <DockPanel
+                    x:Name="DeviceConnection"
+                    Height="50"
+                    Margin="{Binding DeviceConnectionMargin}"
+                    Background="{DynamicResource White}">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="49*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40pt" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border
+                            Grid.RowSpan="2"
+                            Grid.ColumnSpan="3"
+                            BorderBrush="{DynamicResource BorderGray}"
+                            BorderThickness="1"
+                            CornerRadius="6" />
+
+                        <Image
+                            Width="24"
+                            Height="24"
+                            Margin="0,13,0,12"
+                            HorizontalAlignment="Center"
+                            Source="{Binding DeviceConnectionImage}"
+                            Stretch="Uniform" />
+
+                        <TextBlock
+                            x:Name="DeviceConnectionTextBlock"
+                            Grid.Column="1"
+                            Width="100"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource Inter}"
+                            FontSize="9pt"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource MenuFontGray}"
+                            Text="{Binding DeviceConnectionText}"
+                            TextWrapping="Wrap" />
+                        <Ellipse
+                            Grid.Column="3"
+                            Width="10"
+                            Height="10"
+                            Margin="0,0,10,0"
+                            Fill="{Binding EllipseConnectionColor, Mode=OneWay}" />
+                    </Grid>
+                </DockPanel>
+
+                <DockPanel HorizontalAlignment="Right">
+                    <!--<DockPanel Margin="0, 0, 6, 0">
+                        <TextBlock Text="Console : "
+                                   FontFamily="{StaticResource Inter}"
+                                   FontSize="8pt"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="{StaticResource MenuFontGray}"></TextBlock>
+                    </DockPanel>-->
+                    <!--<DockPanel>
+                        <Border CornerRadius="6"
+                                Width="160pt"
+                                Height="20pt"
+                                Margin="0,0,20,0"
+                                Background="{DynamicResource BackgroundGray}">
+                            <TextBlock Text="{Binding MainApplicationStateText}"
+                                       FontFamily="{StaticResource Inter}"
+                                       FontSize="8pt"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFontGray}">
+                            </TextBlock>
+                        </Border>
+                    </DockPanel>-->
+                    <DockPanel x:Name="Reconnection" Margin="0,0,10,0">
+                        <ComboBox Width="100" 
+                                  Height="30"
+                                  Cursor="Hand"
+                                  Text="Porta COM">
+                            <ComboBoxItem Content="COM1" />
+                            <ComboBoxItem Content="TEST2" />
+                            <ComboBoxItem Content="TESTE3" />
+                            <ComboBoxItem Content="TEST4" />
+
+                            <ComboBox.Style>
+                                <Style TargetType="{x:Type ComboBox}">
+                                    <Setter Property="Background"
+                                            Value="{DynamicResource BackgroundGray}" />
+                                    <Setter Property="BorderBrush"
+                                            Value="{DynamicResource BorderGray}" />
+                                    <Setter Property="BorderThickness"
+                                            Value="1" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ComboBox}">
+                                                <Grid>
+                                                    <!-- FUNDO COM CANTO ARREDONDADO -->
+                                                    <Border x:Name="Chrome"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                            CornerRadius="6" />
+
+                                                    <!-- BOTÃO QUE OCUPA TUDO, MAS TRANSPARENTE -->
+                                                    <ToggleButton x:Name="ToggleButton"
+                                                                  Background="Transparent"
+                                                                  BorderThickness="0"
+                                                                  IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                                  ClickMode="Press"
+                                                                  Focusable="False">
+                                                        <Grid>
+                                                            <!-- Texto do selecionado -->
+                                                            <ContentPresenter Margin="6,0,25,0"
+                                                                              VerticalAlignment="Center"
+                                                                              HorizontalAlignment="Left"
+                                                                              IsHitTestVisible="False"
+                                                                              Content="{TemplateBinding SelectionBoxItem}"
+                                                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" />
+
+                                                            <!-- Placeholder quando nada selecionado -->
+                                                            <TextBlock x:Name="Placeholder"
+                                                                       Margin="6,0,25,0"
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="{DynamicResource BorderGray}"
+                                                                       Text="{TemplateBinding Text}"
+                                                                       Visibility="Collapsed"
+                                                                       IsHitTestVisible="False" />
+
+                                                            <!-- Seta -->
+                                                            <Path HorizontalAlignment="Right"
+                                                                  VerticalAlignment="Center"
+                                                                  Margin="0,0,8,0"
+                                                                  Data="M 0 0 L 4 4 L 8 0 Z"
+                                                                  Fill="{DynamicResource BorderGray}" />
+                                                        </Grid>
+                                                    </ToggleButton>
+
+                                                    <!-- Dropdown -->
+                                                    <Popup x:Name="PART_Popup"
+                                                           AllowsTransparency="True"
+                                                           Focusable="False"
+                                                           IsOpen="{TemplateBinding IsDropDownOpen}"
+                                                           Placement="Bottom"
+                                                           PopupAnimation="Slide"
+                                                           MinWidth="{TemplateBinding ActualWidth}">
+                                                        <Border Background="White"
+                                                                BorderBrush="{DynamicResource BorderGray}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="6">
+                                                            <ScrollViewer>
+                                                                <ItemsPresenter />
+                                                            </ScrollViewer>
+                                                        </Border>
+                                                    </Popup>
+                                                </Grid>
+
+                                                <ControlTemplate.Triggers>
+                                                    <!-- Placeholder visível quando nada selecionado -->
+                                                    <Trigger Property="SelectedIndex"
+                                                             Value="-1">
+                                                        <Setter TargetName="Placeholder"
+                                                                Property="Visibility"
+                                                                Value="Visible" />
+                                                    </Trigger>
+
+                                                    <!-- (opcional) hover/foco -->
+                                                    <Trigger Property="IsMouseOver"
+                                                             Value="True">
+                                                        <!--<Setter TargetName="Chrome" Property="Background" Value="{DynamicResource White}"/>-->
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ComboBox.Style>
+                        </ComboBox>
+
+
+
+
+                        <Button
+                            x:Name="ReconnectionButton"
+                            Width="100"
+                            Height="30"
+                            BorderBrush="{DynamicResource White}"
+                            Command="{Binding ConnectCommand}"
+                            Content="{Binding ConnectButtonText}"
+                            Cursor="Hand">
+
+                            <Button.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="6" />
+                                </Style>
+                            </Button.Resources>
+
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Button}">
+                                                <Border
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{DynamicResource BorderGray}"
+                                                    BorderThickness="1">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource White}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button
+                            x:Name="StartStopButton"
+                            Width="100"
+                            Height="30"
+                            BorderBrush="{DynamicResource White}"
+                            Command="{Binding StartStopCommand}"
+                            Content="{Binding StartStopText}"
+                            Cursor="Hand">
+
+                            <Button.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="6" />
+                                </Style>
+                            </Button.Resources>
+
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Button}">
+                                                <Border
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{DynamicResource BorderGray}"
+                                                    BorderThickness="1">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource White}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button
+                            x:Name="SetZeroButton"
+                            Width="100"
+                            Height="30"
+                            BorderBrush="{DynamicResource White}"
+                            Command="{Binding SetZeroCommand}"
+                            Content="Zerar Medição"
+                            Cursor="Hand">
+
+                            <Button.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="6" />
+                                </Style>
+                            </Button.Resources>
+
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Button}">
+                                                <Border
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{DynamicResource BorderGray}"
+                                                    BorderThickness="1">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource White}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button
+                            x:Name="ExportButton"
+                            Width="100"
+                            Height="30"
+                            BorderBrush="{DynamicResource White}"
+                            Command="{Binding ConnectCommand}"
+                            Content="Exportar Excel"
+                            Cursor="Hand">
+
+                            <Button.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="CornerRadius" Value="6" />
+                                </Style>
+                            </Button.Resources>
+
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Button}">
+                                                <Border
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{DynamicResource BorderGray}"
+                                                    BorderThickness="1">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource White}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </DockPanel>
+                </DockPanel>
+
+            </DockPanel>
+        </Grid>
+        <ContentControl
+            Grid.Row="3"
+            Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Content="{Binding CurrentUserControl}" />
     </Grid>
 </Window>
