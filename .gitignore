@@ -22,7 +22,6 @@ ehthumbs.db
 # WPF-specific
 *.g.i.cs
 *.g.cs
-*.xaml.cs
 
 # NuGet Packages
 *.nupkg
