@@ -171,7 +171,7 @@ public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a clas
 
     private void UpdateMenuItemModelList()
     {
-        MenuItemModelList.Add(new MenuItemModel("Real Time Monitoring", "/Assets/Images/icons8-grafico-24.png", "/Assets/Images/icons8-grafico-24-white.png", (RelayCommand)MonitoringViewCommand));
+        MenuItemModelList.Add(new MenuItemModel("Real Time Monitoring", "/Assets/Images/icons8-grafico-24.png", "/Assets/Images/icons8-graph-gif-white.gif", (RelayCommand)MonitoringViewCommand));
 
     }
 
