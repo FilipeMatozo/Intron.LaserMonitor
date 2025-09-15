@@ -1,12 +1,17 @@
-﻿using System;
+﻿using Intron.LaserMonitor.Contracts.Services;
+using OxyPlot;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics.Tracing;
+using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO.Ports;
-using System.Diagnostics;
-using System.Diagnostics.Tracing;
-using Intron.LaserMonitor.Contracts.Services;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Intron.LaserMonitor.Services
 {
@@ -42,16 +47,46 @@ namespace Intron.LaserMonitor.Services
                 {
                     NewLine = "\r\n",
                     Encoding = Encoding.ASCII,
+                    ReadTimeout = 1000,
+                    WriteTimeout = 1000
                 };
-                _serialPort.DataReceived += OnDataReceived;
+
                 _serialPort.Open();
 
+                if (!VerifyDevice())
+                {
+                    MessageBox.Show("Dispositivo inválido. Por favor conecte o laser.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Disconnect();
+                    return false;
+                }
+
+                _serialPort.DataReceived += OnDataReceived;
                 Connected?.Invoke(this, new());
                 return true;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Erro ao conectar a {portName} com {baudRate}: {ex}");
+                Disconnect();
+                MessageBox.Show("Falha ao conectar à porta serial.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+
+        private bool VerifyDevice()
+        {
+            _serialPort.DiscardInBuffer();
+            _serialPort.DiscardOutBuffer();
+            _serialPort.WriteLine("iGET:6");
+
+            try
+            {
+                string line = _serialPort.ReadLine();
+                line = line.Replace("\r", "").Replace("\n", "").Trim();
+                return string.Equals(line.Trim(), "ADDRESS=1", StringComparison.Ordinal);
+            }
+            catch (Exception ex)
+            {
                 return false;
             }
         }

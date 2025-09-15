@@ -116,7 +116,7 @@ public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a clas
                 return;
             if (!_serialService.Connect(SelectedPort))
             {
-                MessageBox.Show("Falha ao conectar à porta serial.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+               
             }
         }
         else
