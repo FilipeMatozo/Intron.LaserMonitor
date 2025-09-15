@@ -6,12 +6,13 @@
     xmlns:local="clr-namespace:Intron.LaserMonitor">
     <Application.Resources>
         <ResourceDictionary>
+            <Style x:Key="DefaultButton" TargetType="Button" />
             <FontFamily x:Key="Inter">pack://application:,,,/Assets/Fonts/#Inter</FontFamily>
             <!--<fx:InvertEffect x:Key="InvertOnHover" x:Shared="False" />-->
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Themes/IntronLightTheme.xaml" />
                 <ResourceDictionary Source="/Styles/Buttons.xaml" />
-            </ResourceDictionary.MergedDictionaries>            
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

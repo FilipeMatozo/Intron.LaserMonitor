@@ -1,42 +1,34 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Style global para Button -->
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  Style global para Button  -->
     <Style TargetType="Button">
-        <Setter Property="Cursor"
-                Value="Hand" />
-        <Setter Property="Background"
-                Value="{DynamicResource BackgroundGray}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
 
-        <!-- Template igual ao seu: Border com canto 6, borda 1px BorderGray -->
+        <!--  Template igual ao seu: Border com canto 6, borda 1px BorderGray  -->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="RootBorder"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{DynamicResource BorderGray}"
-                            BorderThickness="1"
-                            CornerRadius="6">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center" />
+                    <Border
+                        x:Name="RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{DynamicResource BorderGray}"
+                        BorderThickness="1"
+                        CornerRadius="6">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
 
-        <!-- Mesmos triggers do seu exemplo -->
+        <!--  Mesmos triggers do seu exemplo  -->
         <Style.Triggers>
-            <Trigger Property="IsMouseOver"
-                     Value="True">
-                <Setter Property="Background"
-                        Value="{DynamicResource White}" />
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource White}" />
             </Trigger>
 
-            <Trigger Property="IsEnabled"
-                     Value="False">
-                <Setter Property="Foreground"
-                        Value="Gray" />
-                <Setter Property="Background"
-                        Value="LightGray" />
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="Gray" />
+                <Setter Property="Background" Value="LightGray" />
             </Trigger>
         </Style.Triggers>
     </Style>

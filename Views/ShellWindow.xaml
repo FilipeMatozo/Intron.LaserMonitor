@@ -110,7 +110,8 @@
                             BorderBrush="Transparent"
                             BorderThickness="0"
                             Command="{Binding OpenMainWindowCommand}"
-                            Cursor="Hand">
+                            Cursor="Hand"
+                            Style="{StaticResource DefaultButton}">
                             <Viewbox>
                                 <Image Source="/Assets/Images/logo-name-min-50.png" Stretch="None" />
                             </Viewbox>
@@ -308,82 +309,87 @@
                         </Border>
                     </DockPanel>-->
                     <DockPanel x:Name="Reconnection" Margin="0,0,10,0">
-                        <ComboBox Width="100"
-                                  Height="30"
-                                  Margin="15, 0, 10, 0"
-                                  Cursor="Hand"
-                                  ItemsSource="{Binding AvailablePorts}"
-                                  SelectedItem="{Binding SelectedPort}"
-                                  IsEnabled="{Binding IsSerialDisconnected}"
-                                  DropDownOpened="ComboBox_DropDownOpened"
-                                  Text="Porta COM">
+                        <ComboBox
+                            Width="100"
+                            Height="30"
+                            Margin="15,0,10,0"
+                            Cursor="Hand"
+                            DropDownOpened="ComboBox_DropDownOpened"
+                            IsEnabled="{Binding IsSerialDisconnected}"
+                            ItemsSource="{Binding AvailablePorts}"
+                            SelectedItem="{Binding SelectedPort}"
+                            Text="Porta COM">
                             <ComboBox.Style>
                                 <Style TargetType="{x:Type ComboBox}">
-                                    <Setter Property="Background"
-                                            Value="{DynamicResource BackgroundGray}" />
-                                    <Setter Property="BorderBrush"
-                                            Value="{DynamicResource BorderGray}" />
-                                    <Setter Property="BorderThickness"
-                                            Value="1" />
+                                    <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderGray}" />
+                                    <Setter Property="BorderThickness" Value="1" />
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ComboBox}">
                                                 <Grid>
-                                                    <!-- FUNDO COM CANTO ARREDONDADO -->
-                                                    <Border x:Name="Chrome"
-                                                            Background="{TemplateBinding Background}"
-                                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                                            CornerRadius="6" />
+                                                    <!--  FUNDO COM CANTO ARREDONDADO  -->
+                                                    <Border
+                                                        x:Name="Chrome"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        CornerRadius="6" />
 
-                                                    <!-- BOTÃO QUE OCUPA TUDO, MAS TRANSPARENTE -->
-                                                    <ToggleButton x:Name="ToggleButton"
-                                                                  Background="Transparent"
-                                                                  BorderBrush="Transparent"
-                                                                  BorderThickness="0"
-                                                                  IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                                                  ClickMode="Press"                                                                  
-                                                                  Focusable="False">
+                                                    <!--  BOTÃO QUE OCUPA TUDO, MAS TRANSPARENTE  -->
+                                                    <ToggleButton
+                                                        x:Name="ToggleButton"
+                                                        Background="Transparent"
+                                                        BorderBrush="Transparent"
+                                                        BorderThickness="0"
+                                                        ClickMode="Press"
+                                                        Focusable="False"
+                                                        IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
                                                         <Grid>
-                                                            <!-- Texto do selecionado -->
-                                                            <ContentPresenter Margin="6,0,25,0"
-                                                                              VerticalAlignment="Center"
-                                                                              HorizontalAlignment="Left"
-                                                                              IsHitTestVisible="False"
-                                                                              Content="{TemplateBinding SelectionBoxItem}"
-                                                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" />
+                                                            <!--  Texto do selecionado  -->
+                                                            <ContentPresenter
+                                                                Margin="6,0,25,0"
+                                                                HorizontalAlignment="Left"
+                                                                VerticalAlignment="Center"
+                                                                Content="{TemplateBinding SelectionBoxItem}"
+                                                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                                IsHitTestVisible="False" />
 
-                                                            <!-- Placeholder quando nada selecionado -->
-                                                            <TextBlock x:Name="Placeholder"
-                                                                       Margin="6,0,25,0"
-                                                                       VerticalAlignment="Center"
-                                                                       Foreground="{DynamicResource Black}"
-                                                                       Text="{TemplateBinding Text}"
-                                                                       Visibility="Collapsed"
-                                                                       IsHitTestVisible="False" />
+                                                            <!--  Placeholder quando nada selecionado  -->
+                                                            <TextBlock
+                                                                x:Name="Placeholder"
+                                                                Margin="6,0,25,0"
+                                                                VerticalAlignment="Center"
+                                                                Foreground="{DynamicResource Black}"
+                                                                IsHitTestVisible="False"
+                                                                Text="{TemplateBinding Text}"
+                                                                Visibility="Collapsed" />
 
-                                                            <!-- Seta -->
-                                                            <Path HorizontalAlignment="Right"
-                                                                  VerticalAlignment="Center"
-                                                                  Margin="0,0,8,0"
-                                                                  Data="M 0 0 L 4 4 L 8 0 Z"
-                                                                  Fill="{DynamicResource BorderGray}" />
+                                                            <!--  Seta  -->
+                                                            <Path
+                                                                Margin="0,0,8,0"
+                                                                HorizontalAlignment="Right"
+                                                                VerticalAlignment="Center"
+                                                                Data="M 0 0 L 4 4 L 8 0 Z"
+                                                                Fill="{DynamicResource BorderGray}" />
                                                         </Grid>
                                                     </ToggleButton>
 
-                                                    <!-- Dropdown -->
-                                                    <Popup x:Name="PART_Popup"
-                                                           AllowsTransparency="True"
-                                                           Focusable="False"
-                                                           IsOpen="{TemplateBinding IsDropDownOpen}"
-                                                           Placement="Bottom"
-                                                           PopupAnimation="Slide"
-                                                           MinWidth="{TemplateBinding ActualWidth}">
-                                                        <Border Background="White"
-                                                                BorderBrush="{DynamicResource BorderGray}"
-                                                                BorderThickness="1"
-                                                                CornerRadius="6">
+                                                    <!--  Dropdown  -->
+                                                    <Popup
+                                                        x:Name="PART_Popup"
+                                                        MinWidth="{TemplateBinding ActualWidth}"
+                                                        AllowsTransparency="True"
+                                                        Focusable="False"
+                                                        IsOpen="{TemplateBinding IsDropDownOpen}"
+                                                        Placement="Bottom"
+                                                        PopupAnimation="Slide">
+                                                        <Border
+                                                            Background="White"
+                                                            BorderBrush="{DynamicResource BorderGray}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="6">
                                                             <ScrollViewer>
                                                                 <ItemsPresenter />
                                                             </ScrollViewer>
@@ -392,17 +398,13 @@
                                                 </Grid>
 
                                                 <ControlTemplate.Triggers>
-                                                    <!-- Placeholder visível quando nada selecionado -->
-                                                    <Trigger Property="SelectedIndex"
-                                                             Value="-1">
-                                                        <Setter TargetName="Placeholder"
-                                                                Property="Visibility"
-                                                                Value="Visible" />
+                                                    <!--  Placeholder visível quando nada selecionado  -->
+                                                    <Trigger Property="SelectedIndex" Value="-1">
+                                                        <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
                                                     </Trigger>
 
-                                                    <!-- (opcional) hover/foco -->
-                                                    <Trigger Property="IsMouseOver"
-                                                             Value="True">
+                                                    <!--  (opcional) hover/foco  -->
+                                                    <Trigger Property="IsMouseOver" Value="True">
                                                         <!--<Setter TargetName="Chrome" Property="Background" Value="{DynamicResource White}"/>-->
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
@@ -412,12 +414,12 @@
                                 </Style>
                             </ComboBox.Style>
                         </ComboBox>
-                        <Button x:Name="ReconnectionButton"
-                                Width="100"
-                                Height="30"
-                                Command="{Binding ConnectDisconnectCommand}"
-                                Content="{Binding ConnectButtonText}">
-                        </Button>
+                        <Button
+                            x:Name="ReconnectionButton"
+                            Width="100"
+                            Height="30"
+                            Command="{Binding ConnectDisconnectCommand}"
+                            Content="{Binding ConnectButtonText}" />
                     </DockPanel>
                 </DockPanel>
 
