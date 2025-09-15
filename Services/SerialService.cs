@@ -73,7 +73,7 @@ namespace Intron.LaserMonitor.Services
             {
                 Debug.WriteLine($"Erro ao conectar a {portName} com {baudRate}: {ex}");
                 Disconnect();
-                MessageBox.Show("Falha ao conectar à porta serial.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Falha ao conectar à porta serial.\n{ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
