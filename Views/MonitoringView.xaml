@@ -49,6 +49,12 @@
                         Height="30"
                         Command="{Binding ExportToExcelCommand}"
                         Content="Exportar Excel" />
+                <Button x:Name="ClearGraphButton"
+                        Width="100"
+                        Margin="5, 0, 0, 0"
+                        Height="30"
+                        Command="{Binding ClearGraphCommand}"
+                        Content="Limpar conteúdo" />
             </StackPanel>
         </Border>
 

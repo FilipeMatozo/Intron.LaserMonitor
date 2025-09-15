@@ -151,6 +151,16 @@ namespace Intron.LaserMonitor.ViewModels
         }
         private bool CanExport() => _allMeasurements.Count > 0;
 
+        [RelayCommand(CanExecute = nameof(CanClearGraph))]
+        private void ClearGraph()
+        {
+            _allMeasurements.Clear();
+            PlotPoints.Clear();
+            PlotModel.InvalidatePlot(true);
+            _zeroOffset = 0;
+            CurrentDistance = "N/A";
+        }
+        private bool CanClearGraph() => IsMeasuring || true; // Por enquanto pode limpar sempre que quiser
         private void SetupPlotModel()
         {
             PlotModel = new PlotModel { Title = "Distância do Laser vs. Tempo" };
