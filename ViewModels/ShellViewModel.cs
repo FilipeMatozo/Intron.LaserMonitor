@@ -116,7 +116,7 @@ public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a clas
                 return;
             if (!_serialService.Connect(SelectedPort))
             {
-               
+                RefreshPorts();
             }
         }
         else

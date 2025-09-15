@@ -318,17 +318,18 @@
                             IsEnabled="{Binding IsSerialDisconnected}"
                             ItemsSource="{Binding AvailablePorts}"
                             SelectedItem="{Binding SelectedPort}"
-                            Text="Porta COM">
+                            Tag="Porta COM">
+                            <!--  use Tag como sua string de placeholder  -->
+
                             <ComboBox.Style>
                                 <Style TargetType="{x:Type ComboBox}">
                                     <Setter Property="Background" Value="{DynamicResource BackgroundGray}" />
-                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderGray}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MenuFontGray}" />
                                     <Setter Property="BorderThickness" Value="1" />
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ComboBox}">
                                                 <Grid>
-                                                    <!--  FUNDO COM CANTO ARREDONDADO  -->
                                                     <Border
                                                         x:Name="Chrome"
                                                         Background="{TemplateBinding Background}"
@@ -336,7 +337,6 @@
                                                         BorderThickness="{TemplateBinding BorderThickness}"
                                                         CornerRadius="6" />
 
-                                                    <!--  BOTÃO QUE OCUPA TUDO, MAS TRANSPARENTE  -->
                                                     <ToggleButton
                                                         x:Name="ToggleButton"
                                                         Background="Transparent"
@@ -346,8 +346,9 @@
                                                         Focusable="False"
                                                         IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
                                                         <Grid>
-                                                            <!--  Texto do selecionado  -->
+                                                            <!--  texto da seleção  -->
                                                             <ContentPresenter
+                                                                x:Name="SelectionText"
                                                                 Margin="6,0,25,0"
                                                                 HorizontalAlignment="Left"
                                                                 VerticalAlignment="Center"
@@ -356,17 +357,16 @@
                                                                 ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
                                                                 IsHitTestVisible="False" />
 
-                                                            <!--  Placeholder quando nada selecionado  -->
+                                                            <!--  placeholder  -->
                                                             <TextBlock
                                                                 x:Name="Placeholder"
                                                                 Margin="6,0,25,0"
                                                                 VerticalAlignment="Center"
                                                                 Foreground="{DynamicResource Black}"
                                                                 IsHitTestVisible="False"
-                                                                Text="{TemplateBinding Text}"
+                                                                Text="{TemplateBinding Tag}"
                                                                 Visibility="Collapsed" />
 
-                                                            <!--  Seta  -->
                                                             <Path
                                                                 Margin="0,0,8,0"
                                                                 HorizontalAlignment="Right"
@@ -376,7 +376,6 @@
                                                         </Grid>
                                                     </ToggleButton>
 
-                                                    <!--  Dropdown  -->
                                                     <Popup
                                                         x:Name="PART_Popup"
                                                         MinWidth="{TemplateBinding ActualWidth}"
@@ -398,14 +397,16 @@
                                                 </Grid>
 
                                                 <ControlTemplate.Triggers>
-                                                    <!--  Placeholder visível quando nada selecionado  -->
-                                                    <Trigger Property="SelectedIndex" Value="-1">
+                                                    <!--  Mostrar placeholder quando não há seleção  -->
+                                                    <Trigger Property="SelectedItem" Value="{x:Null}">
                                                         <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
+                                                        <Setter TargetName="SelectionText" Property="Visibility" Value="Collapsed" />
                                                     </Trigger>
 
-                                                    <!--  (opcional) hover/foco  -->
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <!--<Setter TargetName="Chrome" Property="Background" Value="{DynamicResource White}"/>-->
+                                                    <!--  Mostrar placeholder quando não há itens  -->
+                                                    <Trigger Property="HasItems" Value="False">
+                                                        <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
+                                                        <Setter TargetName="SelectionText" Property="Visibility" Value="Collapsed" />
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
