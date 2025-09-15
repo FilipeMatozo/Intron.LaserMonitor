@@ -121,7 +121,7 @@ public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a clas
         }
         else
         {
-            _serialService.Disconnect();
+            _serialService.Dispose();
         }
     }
     private bool CanConnectDisconnect()

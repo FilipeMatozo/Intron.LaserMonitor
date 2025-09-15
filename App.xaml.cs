@@ -42,10 +42,8 @@ namespace Intron.LaserMonitor
                 services.AddSingleton<IExcelExportService, ExcelExportService>();
 
                 // Configure views and viewModels
-                services.AddTransient<MainViewModel>();
-                services.AddTransient<MainWindow>();
                 services.AddTransient<ShellWindow>();
-                services.AddTransient<ShellViewModel>();
+                services.AddSingleton<ShellViewModel>();
                 services.AddTransient<MonitoringView>();
                 services.AddTransient<MonitoringViewModel>();
             })

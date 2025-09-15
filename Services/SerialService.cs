@@ -17,7 +17,7 @@ namespace Intron.LaserMonitor.Services
 {
     public class SerialService : ISerialService
     {
-        private SerialPort _serialPort;
+        private SerialPort _serialPort = new();
 
         public bool IsConnected
         {
@@ -28,6 +28,11 @@ namespace Intron.LaserMonitor.Services
         public event EventHandler Disconnected;
         public event EventHandler<bool> OnMeasurementStateChanged;
         public event EventHandler<Models.Events.DataReceivedEventArgs> DataReceived;   
+
+        public SerialService()
+        {
+            App.Current.Exit += (s, e) => Dispose();
+        }
 
         public IEnumerable<string> GetAvailableSerialPorts()
         {
@@ -161,6 +166,12 @@ namespace Intron.LaserMonitor.Services
                 Debug.WriteLine($"Erro ao enviar comando ao: {ex}");
                 return;
             }
+        }
+
+        public async void Dispose()
+        {
+            await StopMeasurement(new());
+            Disconnect();
         }
     }
 }

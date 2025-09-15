@@ -2,7 +2,7 @@
 
 namespace Intron.LaserMonitor.Contracts.Services;
 
-public interface ISerialService 
+public interface ISerialService : IDisposable
 {
     event EventHandler Connected;
     event EventHandler Disconnected;

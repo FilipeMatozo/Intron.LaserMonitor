@@ -1,6 +1,7 @@
 ﻿using Intron.LaserMonitor.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,14 @@ namespace Intron.LaserMonitor.Views
             InitializeComponent();
             ViewModel = App.GetService<MonitoringViewModel>();
             DataContext = ViewModel;
+
+            this.Unloaded += MonitoringView_Unloaded;
+        }
+
+        private void MonitoringView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel is IDisposable disposable)
+                disposable.Dispose();
         }
     }
 }

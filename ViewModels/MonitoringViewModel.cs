@@ -229,5 +229,13 @@ namespace Intron.LaserMonitor.ViewModels
                 CurrentDistance = "N/A";
             }
         }
+
+        public void Dispose()
+        {
+            UnsubscribeEvents();
+            _serialService.StopMeasurement(new());
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource.Dispose();
+        }
     }
 }
