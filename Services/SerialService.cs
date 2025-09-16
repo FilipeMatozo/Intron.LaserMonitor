@@ -82,17 +82,38 @@ namespace Intron.LaserMonitor.Services
         {
             _serialPort.DiscardInBuffer();
             _serialPort.DiscardOutBuffer();
-            _serialPort.WriteLine("iGET:6");
+            _serialPort.WriteLine("iHALT");
 
             try
             {
-                string line = _serialPort.ReadLine();
-                line = line.Replace("\r", "").Replace("\n", "").Trim();
-                return string.Equals(line.Trim(), "ADDRESS=1", StringComparison.Ordinal);
+                while (true) 
+                {
+                    var line = _serialPort.ReadLine().Trim();
+
+                    if (line == "STOP" || line == "OK")
+                        return true;
+                }
             }
             catch (Exception ex)
             {
                 return false;
+            }
+        }
+
+        private void OnDataReceivedVerify(object sender, SerialDataReceivedEventArgs e)
+        {
+            if (!_serialPort.IsOpen)
+                return;
+
+            try
+            {
+                string data = _serialPort.ReadLine();
+                DataReceived?.Invoke(this, new(data));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Erro ao receber os dados: {ex.Message}");
+                return;
             }
         }
 
