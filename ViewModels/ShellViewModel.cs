@@ -161,13 +161,13 @@ public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a clas
 
         if (IsMenuItemListOpen)
         {
-            DeviceConnectionMargin = new Thickness(110, 0, 0, 0);
+            //DeviceConnectionMargin = new Thickness(110, 0, 0, 0);
             LogoCloseMenu = Visibility.Collapsed;
             LogoOpenMenu = Visibility.Visible;
         }
         else
         {
-            DeviceConnectionMargin = new Thickness(6, 0, 0, 0);
+            //DeviceConnectionMargin = new Thickness(6, 0, 0, 0);
             LogoCloseMenu = Visibility.Visible;
             LogoOpenMenu = Visibility.Collapsed;
         }

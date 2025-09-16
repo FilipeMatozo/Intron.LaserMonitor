@@ -63,7 +63,7 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="190" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -222,14 +222,12 @@
         <Grid
             x:Name="TopMenu"
             Grid.Row="1"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Background="{StaticResource White}"
-            Grid.ZIndex="2">
+            Grid.Column="1"
+            Background="{StaticResource White}">
 
             <Border BorderBrush="{DynamicResource BorderGray}" BorderThickness="0,0,0,1.2" />
 
-            <DockPanel x:Name="TopBar" Margin="96,0,0,0">
+            <DockPanel x:Name="TopBar" Margin="9,0,0,0">
 
                 <DockPanel
                     x:Name="DeviceConnection"
