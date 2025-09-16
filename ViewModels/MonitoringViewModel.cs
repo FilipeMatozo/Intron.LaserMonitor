@@ -41,7 +41,7 @@ namespace Intron.LaserMonitor.ViewModels
 
         public string StartStopText
         {
-            get => !IsMeasuring ? "Iniciar" : "Interromper";
+            get => !IsMeasuring && IsConnected ? "Iniciar" : "Interromper";
         }
 
         [ObservableProperty]

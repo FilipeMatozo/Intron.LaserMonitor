@@ -1,17 +1,8 @@
 ﻿using Intron.LaserMonitor.Contracts.Services;
-using OxyPlot;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Diagnostics.Tracing;
-using System.IO;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Intron.LaserMonitor.Services
 {
@@ -24,16 +15,72 @@ namespace Intron.LaserMonitor.Services
             get => _serialPort.IsOpen;
         }
 
-        public event EventHandler Connected;   
+        public event EventHandler Connected;
         public event EventHandler Disconnected;
         public event EventHandler<bool> OnMeasurementStateChanged;
-        public event EventHandler<Models.Events.DataReceivedEventArgs> DataReceived;   
+        public event EventHandler<Models.Events.DataReceivedEventArgs> DataReceived;
+        private CancellationTokenSource? _cts;
+        private Task? _checkTask;
 
         public SerialService()
         {
             App.Current.Exit += (s, e) => Dispose();
         }
-        
+        #region CheckConnection
+        /// <summary>
+        /// Inicia a rotina de monitoramento da conexão serial.
+        /// </summary>
+        private void StartCheckRoutine()
+        {
+            if (_cts != null)
+            {
+                StopCheckRoutine();
+            }               
+
+            _cts = new CancellationTokenSource();
+            _checkTask = Task.Run(() => CheckConnectionRoutine(_cts.Token));
+        }
+
+        /// <summary>
+        /// Para a rotina de monitoramento.
+        /// </summary>
+        private void StopCheckRoutine()
+        {
+            if (_cts == null)
+                return;
+
+            _cts.Cancel();
+            _cts.Dispose();
+            _cts = null;
+            _checkTask = null; // deixamos a Task finalizar naturalmente
+        }
+
+        private async Task CheckConnectionRoutine(CancellationToken token)
+        {
+            try
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    if (!_serialPort.IsOpen)
+                    {
+                        RaiseDisconnectEvent();
+                        _cts?.Cancel();
+                        continue;
+                    }
+
+                    await Task.Delay(1000, token); // intervalo de 1s
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // esperado no cancelamento
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        #endregion
         public IEnumerable<string> GetAvailableSerialPorts()
         {
             return SerialPort.GetPortNames();
@@ -45,6 +92,7 @@ namespace Intron.LaserMonitor.Services
             {
                 if (_serialPort != null && _serialPort.IsOpen)
                 {
+                    StopCheckRoutine();
                     Disconnect();
                 }
 
@@ -67,11 +115,13 @@ namespace Intron.LaserMonitor.Services
 
                 _serialPort.DataReceived += OnDataReceived;
                 Connected?.Invoke(this, new());
+                StartCheckRoutine();
                 return true;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Erro ao conectar a {portName} com {baudRate}: {ex}");
+                StopCheckRoutine();
                 Disconnect();
                 MessageBox.Show($"Falha ao conectar à porta serial.\n{ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
@@ -120,7 +170,7 @@ namespace Intron.LaserMonitor.Services
         private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             if (!_serialPort.IsOpen)
-                return; 
+                return;
 
             try
             {
@@ -144,7 +194,7 @@ namespace Intron.LaserMonitor.Services
                 _serialPort.DataReceived -= OnDataReceived;
                 _serialPort.Close();
             }
-           
+
             catch (Exception ex)
             {
                 Debug.WriteLine($"Erro ao desconectar: {ex}");
@@ -187,10 +237,24 @@ namespace Intron.LaserMonitor.Services
                 return;
             }
         }
-
-        public async void Dispose()
+        protected virtual void RaiseDisconnectEvent()
         {
-            await StopMeasurement(new());
+            var handler = Disconnected;
+            if (handler is null) return;
+
+            try
+            {
+                Application.Current.Dispatcher.BeginInvoke(() => handler(this, new()));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Handler falhou: {ex}");
+            }
+        }
+        public void Dispose()
+        {
+            _ = Task.Run(() => StopMeasurement(new()));
+            StopCheckRoutine();
             Disconnect();
         }
     }

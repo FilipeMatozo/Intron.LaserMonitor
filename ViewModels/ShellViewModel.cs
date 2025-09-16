@@ -20,6 +20,10 @@ public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a clas
     [NotifyPropertyChangedFor(nameof(IsSerialDisconnected))]
     [ObservableProperty]
     private bool isSerialConnected = false;
+    partial void OnIsSerialConnectedChanged(bool value)
+    {
+        LoadComboboxes();
+    }
 
     public bool IsSerialDisconnected
     {
@@ -91,7 +95,7 @@ public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a clas
     private void LoadComboboxes()
     {
         RefreshPorts();
-        SelectedPort = AvailablePorts.FirstOrDefault()!;
+        //SelectedPort = AvailablePorts.FirstOrDefault()!;
     }
 
     [RelayCommand]
