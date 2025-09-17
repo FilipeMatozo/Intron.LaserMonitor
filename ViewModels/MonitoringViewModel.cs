@@ -58,8 +58,10 @@ namespace Intron.LaserMonitor.ViewModels
         }
 
         public PlotModel PlotModel { get; private set; }
+        public PlotController PlotController { get; private set; }
         public List<DataPoint> PlotPoints { get; private set; } = new();
 
+        private int _maxSecsPlotPoint = 10;
         private double _zeroOffset = 0;
 
         public MonitoringViewModel(ISerialService serialService, IExcelExportService excelExportService)
@@ -162,9 +164,14 @@ namespace Intron.LaserMonitor.ViewModels
             CurrentDistance = "N/A";
         }
         private bool CanClearGraph() => PlotPoints.Count() > 0 || CurrentDistance != "N/A";
+
         private void SetupPlotModel()
         {
             PlotModel = new PlotModel { Title = "Distância do Laser vs. Tempo" };
+            PlotController = new PlotController();
+            PlotController.UnbindAll();
+            
+            var now = DateTime.Now;
 
             PlotModel.Axes.Add(new DateTimeAxis
             {
@@ -172,7 +179,9 @@ namespace Intron.LaserMonitor.ViewModels
                 Title = "Tempo",
                 StringFormat = "HH:mm:ss.fff",
                 MajorGridlineStyle = LineStyle.Solid,
-                MinorGridlineStyle = LineStyle.Dot
+                MinorGridlineStyle = LineStyle.Dot,
+                Minimum = DateTimeAxis.ToDouble(now),
+                Maximum = DateTimeAxis.ToDouble(now.AddSeconds(_maxSecsPlotPoint))
             });
 
             PlotModel.Axes.Add(new LinearAxis
@@ -219,6 +228,20 @@ namespace Intron.LaserMonitor.ViewModels
                         Application.Current?.Dispatcher.Invoke(() =>
                         {
                             PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+
+                            var xAxis = PlotModel.Axes.OfType<DateTimeAxis>().FirstOrDefault();
+                            if (xAxis is not null)
+                            {
+                                double lastX = DateTimeAxis.ToDouble(measurement.Timestamp);
+                                double width = xAxis.ActualMaximum - xAxis.ActualMinimum;
+
+                                if (double.IsNaN(width) || double.IsInfinity(width) || width <= 0)
+                                    width = DateTimeAxis.ToDouble(DateTime.Now) - DateTimeAxis.ToDouble(DateTime.Now.AddSeconds(_maxSecsPlotPoint));
+
+                                xAxis.Maximum = lastX;
+                                xAxis.Minimum = lastX - width;
+                            }
+
                             ExportToExcelCommand.NotifyCanExecuteChanged();
                             ClearGraphCommand.NotifyCanExecuteChanged();
                         });
