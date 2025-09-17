@@ -171,20 +171,39 @@ namespace Intron.LaserMonitor.ViewModels
             PlotController = new PlotController();
             PlotController.UnbindAll();
 
-            // Scroll para navegar no eixo X
-            PlotController.BindMouseWheel(
-            new DelegatePlotCommand<OxyMouseWheelEventArgs>(
-                (view, controller2, args) =>
-                {
-                    double delta = args.Delta > 0 ? 1 : -1; // scroll up = direita, scroll down = esquerda
-                    const double step = 50; // ajuste conforme sua escala
-                    foreach (var axis in view.ActualModel.Axes.Where(a => a.Position == AxisPosition.Bottom))
+            var controller = PlotController;
+
+            // --- Scroll normal = Pan horizontal ---
+            controller.BindMouseWheel(
+                OxyModifierKeys.None,
+                new DelegatePlotCommand<OxyMouseWheelEventArgs>(
+                    (view, ctl, args) =>
                     {
-                        axis.Pan(delta * step);
-                    }
-                    view.InvalidatePlot(false);
-                    args.Handled = true;
-                }));
+                        double delta = args.Delta > 0 ? -1 : 1; // up = direita, down = esquerda
+                        const double step = 50;
+                        foreach (var axis in view.ActualModel.Axes.Where(a => a.Position == AxisPosition.Bottom))
+                        {
+                            axis.Pan(delta * step);
+                        }
+                        view.InvalidatePlot(false);
+                        args.Handled = true;
+                    }));
+
+            // --- Ctrl + Scroll = Zoom no eixo X ---
+            controller.BindMouseWheel(
+                OxyModifierKeys.Control,
+                new DelegatePlotCommand<OxyMouseWheelEventArgs>(
+                    (view, ctl, args) =>
+                    {
+                        double zoomFactor = args.Delta > 0 ? 1.2 : 0.8;
+                        foreach (var axis in view.ActualModel.Axes.Where(a => a.Position == AxisPosition.Bottom))
+                        {
+                            double x = axis.InverseTransform(args.Position.X);
+                            axis.ZoomAt(zoomFactor, x);
+                        }
+                        view.InvalidatePlot(false);
+                        args.Handled = true;
+                    }));
 
             // Clique esquerdo/direito → resetar todos os eixos
             var resetCommand = new DelegatePlotCommand<OxyMouseDownEventArgs>(
@@ -195,9 +214,10 @@ namespace Intron.LaserMonitor.ViewModels
                     args.Handled = true;
                 });
 
-            PlotController.BindMouseDown(OxyMouseButton.Left, resetCommand);
-            PlotController.BindMouseDown(OxyMouseButton.Right, resetCommand);
- 
+            controller.BindMouseDown(OxyMouseButton.Left, resetCommand);
+            controller.BindMouseDown(OxyMouseButton.Right, resetCommand);
+            controller.BindMouseDown(OxyMouseButton.Middle, resetCommand);
+
             var now = DateTime.Now;
 
             PlotModel.Axes.Add(new DateTimeAxis
