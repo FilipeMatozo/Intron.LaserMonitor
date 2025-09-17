@@ -173,7 +173,7 @@ namespace Intron.LaserMonitor.ViewModels
 
             var controller = PlotController;
 
-            // --- Scroll normal = Pan horizontal ---
+            // --- Scroll normal = Pan horizontal (X) ---
             controller.BindMouseWheel(
                 OxyModifierKeys.None,
                 new DelegatePlotCommand<OxyMouseWheelEventArgs>(
@@ -205,6 +205,25 @@ namespace Intron.LaserMonitor.ViewModels
                         args.Handled = true;
                     }));
 
+            // --- Shift + Scroll = Pan vertical (Y) ---
+            controller.BindMouseWheel(
+                OxyModifierKeys.Shift,
+                new DelegatePlotCommand<OxyMouseWheelEventArgs>(
+                    (view, ctl, args) =>
+                    {
+                        double delta = args.Delta > 0 ? 1 : -1; // up = cima, down = baixo
+                        const double step = 50;
+                        foreach (var axis in view.ActualModel.Axes.Where(a => a.Position == AxisPosition.Left))
+                        {
+                            axis.Pan(delta * step);
+                        }
+                        view.InvalidatePlot(false);
+                        args.Handled = true;
+                    }));
+
+            // 🖱 Botão do meio = Pan livre (X e Y ao mesmo tempo)
+            controller.BindMouseDown(OxyMouseButton.Middle, PlotCommands.PanAt);
+
             // Clique esquerdo/direito → resetar todos os eixos
             var resetCommand = new DelegatePlotCommand<OxyMouseDownEventArgs>(
                 (view, ctl, args) =>
@@ -216,7 +235,7 @@ namespace Intron.LaserMonitor.ViewModels
 
             controller.BindMouseDown(OxyMouseButton.Left, resetCommand);
             controller.BindMouseDown(OxyMouseButton.Right, resetCommand);
-            controller.BindMouseDown(OxyMouseButton.Middle, resetCommand);
+            //controller.BindMouseDown(OxyMouseButton.Middle, resetCommand);
 
             var now = DateTime.Now;
 
