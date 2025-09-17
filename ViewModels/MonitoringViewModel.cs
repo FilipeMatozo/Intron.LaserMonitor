@@ -45,6 +45,7 @@ namespace Intron.LaserMonitor.ViewModels
         }
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ClearGraphCommand))]
         private string _currentDistance = "N/A";
         public string ConnectText
         {
@@ -160,7 +161,7 @@ namespace Intron.LaserMonitor.ViewModels
             _zeroOffset = 0;
             CurrentDistance = "N/A";
         }
-        private bool CanClearGraph() => IsMeasuring || true; // Por enquanto pode limpar sempre que quiser
+        private bool CanClearGraph() => PlotPoints.Count() > 0 || CurrentDistance != "N/A";
         private void SetupPlotModel()
         {
             PlotModel = new PlotModel { Title = "Distância do Laser vs. Tempo" };
@@ -219,6 +220,7 @@ namespace Intron.LaserMonitor.ViewModels
                         {
                             PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
                             ExportToExcelCommand.NotifyCanExecuteChanged();
+                            ClearGraphCommand.NotifyCanExecuteChanged();
                         });
                     PlotModel.InvalidatePlot(true);
 
