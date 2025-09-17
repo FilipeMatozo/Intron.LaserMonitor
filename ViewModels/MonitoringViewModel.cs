@@ -170,7 +170,34 @@ namespace Intron.LaserMonitor.ViewModels
             PlotModel = new PlotModel { Title = "Distância do Laser vs. Tempo" };
             PlotController = new PlotController();
             PlotController.UnbindAll();
-            
+
+            // Scroll para navegar no eixo X
+            PlotController.BindMouseWheel(
+            new DelegatePlotCommand<OxyMouseWheelEventArgs>(
+                (view, controller2, args) =>
+                {
+                    double delta = args.Delta > 0 ? 1 : -1; // scroll up = direita, scroll down = esquerda
+                    const double step = 50; // ajuste conforme sua escala
+                    foreach (var axis in view.ActualModel.Axes.Where(a => a.Position == AxisPosition.Bottom))
+                    {
+                        axis.Pan(delta * step);
+                    }
+                    view.InvalidatePlot(false);
+                    args.Handled = true;
+                }));
+
+            // Clique esquerdo/direito → resetar todos os eixos
+            var resetCommand = new DelegatePlotCommand<OxyMouseDownEventArgs>(
+                (view, ctl, args) =>
+                {
+                    view.ActualModel.ResetAllAxes();
+                    view.InvalidatePlot(false);
+                    args.Handled = true;
+                });
+
+            PlotController.BindMouseDown(OxyMouseButton.Left, resetCommand);
+            PlotController.BindMouseDown(OxyMouseButton.Right, resetCommand);
+ 
             var now = DateTime.Now;
 
             PlotModel.Axes.Add(new DateTimeAxis
