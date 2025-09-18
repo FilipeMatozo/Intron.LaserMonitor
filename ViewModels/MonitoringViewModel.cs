@@ -169,6 +169,7 @@ namespace Intron.LaserMonitor.ViewModels
             PlotModel = new PlotModel { Title = "Distância do Laser vs. Tempo" };
             PlotController = new PlotController();
             PlotController.UnbindAll();
+            PlotController.BindMouseEnter(PlotCommands.HoverSnapTrack);
 
             var controller = PlotController;
 
@@ -263,8 +264,8 @@ namespace Intron.LaserMonitor.ViewModels
                 StrokeThickness = 2,
                 MarkerType = MarkerType.None,
                 ItemsSource = PlotPoints,
-                TrackerFormatString = "Tempo: {2:HH:mm:ss}\nDistância: {4:0.000} m",
-                CanTrackerInterpolatePoints = true
+                TrackerFormatString = "Tempo: {2:HH:mm:ss.fff}\nDistância: {4:0} mm",
+                CanTrackerInterpolatePoints = false
             };
 
             PlotModel.Series.Add(lineSeries);
@@ -287,6 +288,7 @@ namespace Intron.LaserMonitor.ViewModels
                     xAxis.Minimum = lastX - width;
                 }
             }
+
             void AdjustYAxis(DateTime now)
             {
                 var yAxis = PlotModel.Axes.OfType<LinearAxis>()
