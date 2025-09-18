@@ -9,6 +9,7 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -73,8 +74,6 @@ namespace Intron.LaserMonitor.ViewModels
             SetupPlotModel();
             SubscribeEvents();
         }
-
-
 
         private void UnsubscribeEvents()
         {
@@ -265,7 +264,7 @@ namespace Intron.LaserMonitor.ViewModels
                 MarkerType = MarkerType.None,
                 ItemsSource = PlotPoints,
                 TrackerFormatString = "Tempo: {2:HH:mm:ss}\nDistância: {4:0.000} m",
-                CanTrackerInterpolatePoints = false
+                CanTrackerInterpolatePoints = true
             };
 
             PlotModel.Series.Add(lineSeries);
@@ -273,6 +272,57 @@ namespace Intron.LaserMonitor.ViewModels
 
         private void OnDataReceived(object sender, Models.Events.DataReceivedEventArgs dataReceivedEventArgs)
         {
+            void AdjustXAxis(DateTime now)
+            {
+                var xAxis = PlotModel.Axes.OfType<DateTimeAxis>().FirstOrDefault();
+                if (xAxis is not null)
+                {
+                    double lastX = DateTimeAxis.ToDouble(now);
+                    double width = xAxis.ActualMaximum - xAxis.ActualMinimum;
+
+                    if (double.IsNaN(width) || double.IsInfinity(width) || width <= 0)
+                        width = DateTimeAxis.ToDouble(DateTime.Now) - DateTimeAxis.ToDouble(DateTime.Now.AddSeconds(_maxSecsPlotPoint));
+
+                    xAxis.Maximum = lastX;
+                    xAxis.Minimum = lastX - width;
+                }
+            }
+            void AdjustYAxis(DateTime now)
+            {
+                var yAxis = PlotModel.Axes.OfType<LinearAxis>()
+                    .FirstOrDefault(a => a.Position == AxisPosition.Left);
+                if (yAxis is null) return;
+
+                var start = now - TimeSpan.FromSeconds(_maxSecsPlotPoint);
+
+                double min = double.PositiveInfinity;
+                double max = double.NegativeInfinity;
+
+                for (int i = _allMeasurements.Count - 1; i >= 0; i--)
+                {
+                    var m = _allMeasurements[i];
+                    if (m.Timestamp < start) break;
+
+                    if (m.Distance < min) min = m.Distance;
+                    if (m.Distance > max) max = m.Distance;
+                }
+
+                if (double.IsInfinity(min) || double.IsInfinity(max)) return; 
+
+                if (min == max)
+                {
+                    double pad = Math.Max(1e-6, Math.Abs(min) * 0.05 + 0.5);
+                    yAxis.Minimum = min - pad;
+                    yAxis.Maximum = max + pad;
+                }
+                else
+                {
+                    double pad = Math.Max(0.5, (max - min) * 0.10); 
+                    yAxis.Minimum = min - pad;
+                    yAxis.Maximum = max + pad;
+                }
+            }
+
             var data = dataReceivedEventArgs.Data;
 
             if (data.StartsWith("D=") && data.EndsWith("m"))
@@ -295,18 +345,9 @@ namespace Intron.LaserMonitor.ViewModels
                         {
                             PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
 
-                            var xAxis = PlotModel.Axes.OfType<DateTimeAxis>().FirstOrDefault();
-                            if (xAxis is not null)
-                            {
-                                double lastX = DateTimeAxis.ToDouble(measurement.Timestamp);
-                                double width = xAxis.ActualMaximum - xAxis.ActualMinimum;
+                            AdjustXAxis(measurement.Timestamp);
+                            AdjustYAxis(measurement.Timestamp);
 
-                                if (double.IsNaN(width) || double.IsInfinity(width) || width <= 0)
-                                    width = DateTimeAxis.ToDouble(DateTime.Now) - DateTimeAxis.ToDouble(DateTime.Now.AddSeconds(_maxSecsPlotPoint));
-
-                                xAxis.Maximum = lastX;
-                                xAxis.Minimum = lastX - width;
-                            }
 
                             ExportToExcelCommand.NotifyCanExecuteChanged();
                             ClearGraphCommand.NotifyCanExecuteChanged();
@@ -325,11 +366,17 @@ namespace Intron.LaserMonitor.ViewModels
                     DistanceAbsolute = 0
                 };
                 _allMeasurements.Add(measurement);
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
-                    ExportToExcelCommand.NotifyCanExecuteChanged();
-                });
+                if (Application.Current is not null)
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+
+                        AdjustXAxis(measurement.Timestamp);
+                        AdjustYAxis(measurement.Timestamp);
+
+                        ExportToExcelCommand.NotifyCanExecuteChanged();
+                        ClearGraphCommand.NotifyCanExecuteChanged();
+                    });
                 PlotModel.InvalidatePlot(true);
 
                 CurrentDistance = "N/A";
