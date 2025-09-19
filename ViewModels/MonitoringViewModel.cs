@@ -19,7 +19,7 @@ namespace Intron.LaserMonitor.ViewModels
     {
         private readonly ISerialService _serialService;
         private readonly IExcelExportService _excelService;
-        private readonly List<Measurement> _allMeasurements = new();
+        private readonly List<List<Measurement>> _allMeasurements = new() { new() };
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ConnectText))]
@@ -113,6 +113,7 @@ namespace Intron.LaserMonitor.ViewModels
             {
                 cancellationTokenSource = new();
                 _allMeasurements.Clear();
+                _allMeasurements.Add([]);
                 PlotPoints.Clear();
                 PlotModel.InvalidatePlot(true);
                 CurrentDistance = "Iniciando...";
@@ -131,9 +132,10 @@ namespace Intron.LaserMonitor.ViewModels
         [RelayCommand(CanExecute = nameof(CanZeroOffset))]
         private void ZeroOffset()
         {
-            _zeroOffset = _allMeasurements.Last().DistanceAbsolute;
-            _allMeasurements.Clear();
-            PlotPoints.Clear();
+            _zeroOffset = _allMeasurements[_allMeasurements.Count - 1].Last().DistanceAbsolute;
+            _allMeasurements.Add([]);
+            //_allMeasurements.Clear();
+            //PlotPoints.Clear();
         }
         private bool CanZeroOffset() => IsConnected && IsMeasuring;
 
@@ -155,7 +157,7 @@ namespace Intron.LaserMonitor.ViewModels
             {
                 try
                 {
-                    _excelService.Export(_allMeasurements, sfd.FileName);
+                    //_excelService.Export(_allMeasurements, sfd.FileName);
                     //MessageBox.Show($"Dados exportados com sucesso para:\n{sfd.FileName}", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     var (result, dontAsk) = MyMessageBox.Show(
@@ -210,12 +212,13 @@ namespace Intron.LaserMonitor.ViewModels
                 }
             }
         }
-        private bool CanExport() => _allMeasurements.Count > 0;
+        private bool CanExport() => _allMeasurements[_allMeasurements.Count-1].Count > 0;
 
         [RelayCommand(CanExecute = nameof(CanClearGraph))]
         private void ClearGraph()
         {
             _allMeasurements.Clear();
+            _allMeasurements.Add([]);
             PlotPoints.Clear();
             PlotModel.InvalidatePlot(true);
             _zeroOffset = 0;
@@ -368,45 +371,51 @@ namespace Intron.LaserMonitor.ViewModels
             PlotModel.Series.Add(_lineSeries);
         }
 
-        private void OnDataReceived(object sender, Models.Events.DataReceivedEventArgs dataReceivedEventArgs)
+        private void OnDataReceived(object sender, Models.Events.DataReceivedEventArgs e)
         {
+            List<Measurement> CurrentSeries = _allMeasurements[^1]; // série atual (última)
+
             void AdjustXAxis(DateTime now)
             {
                 var xAxis = PlotModel.Axes.OfType<DateTimeAxis>().FirstOrDefault();
-                if (xAxis is not null)
-                {
-                    double lastX = DateTimeAxis.ToDouble(now);
-                    double width = xAxis.ActualMaximum - xAxis.ActualMinimum;
+                if (xAxis is null) return;
 
-                    if (double.IsNaN(width) || double.IsInfinity(width) || width <= 0)
-                        width = DateTimeAxis.ToDouble(DateTime.Now) - DateTimeAxis.ToDouble(DateTime.Now.AddSeconds(_maxSecsPlotPoint));
+                double lastX = DateTimeAxis.ToDouble(now);
+                double width = xAxis.ActualMaximum - xAxis.ActualMinimum;
 
-                    xAxis.Maximum = lastX;
-                    xAxis.Minimum = lastX - width;
-                }
+                // Fallback POSITIVO: futuro - agora
+                if (double.IsNaN(width) || double.IsInfinity(width) || width <= 0)
+                    width = DateTimeAxis.ToDouble(now.AddSeconds(_maxSecsPlotPoint)) - DateTimeAxis.ToDouble(now);
+
+                if (width <= 0) width = DateTimeAxis.ToDouble(now.AddSeconds(1)) - DateTimeAxis.ToDouble(now); // guarda
+
+                xAxis.Maximum = lastX;
+                xAxis.Minimum = lastX - width; // agora Minimum < Maximum
             }
 
             void AdjustYAxis(DateTime now)
             {
-                var yAxis = PlotModel.Axes.OfType<LinearAxis>()
-                    .FirstOrDefault(a => a.Position == AxisPosition.Left);
+                var yAxis = PlotModel.Axes.OfType<LinearAxis>().FirstOrDefault(a => a.Position == AxisPosition.Left);
                 if (yAxis is null) return;
+
+                var series = CurrentSeries;
+                if (series.Count == 0) return;
 
                 var start = now - TimeSpan.FromSeconds(_maxSecsPlotPoint);
 
                 double min = double.PositiveInfinity;
                 double max = double.NegativeInfinity;
 
-                for (int i = _allMeasurements.Count - 1; i >= 0; i--)
+                // Varre só a série atual de trás pra frente (janela de tempo)
+                for (int i = series.Count - 1; i >= 0; i--)
                 {
-                    var m = _allMeasurements[i];
+                    var m = series[i];
                     if (m.Timestamp < start) break;
-
                     if (m.Distance < min) min = m.Distance;
                     if (m.Distance > max) max = m.Distance;
                 }
 
-                if (double.IsInfinity(min) || double.IsInfinity(max)) return; 
+                if (double.IsInfinity(min) || double.IsInfinity(max)) return;
 
                 if (min == max)
                 {
@@ -416,13 +425,13 @@ namespace Intron.LaserMonitor.ViewModels
                 }
                 else
                 {
-                    double pad = Math.Max(0.5, (max - min) * 0.10); 
+                    double pad = Math.Max(0.5, (max - min) * 0.10);
                     yAxis.Minimum = min - pad;
                     yAxis.Maximum = max + pad;
                 }
             }
 
-            var data = dataReceivedEventArgs.Data;
+            var data = e.Data;
 
             if (data.StartsWith("D=") && data.EndsWith("m"))
             {
@@ -430,29 +439,33 @@ namespace Intron.LaserMonitor.ViewModels
 
                 if (double.TryParse(distanceStr, NumberStyles.Float, CultureInfo.InvariantCulture, out var distance))
                 {
-                    distance = distance * 1000;
+                    distance *= 1000;
+
                     var measurement = new Measurement
                     {
                         Timestamp = DateTime.Now,
                         Distance = distance - _zeroOffset,
                         DistanceAbsolute = distance
                     };
-                    _allMeasurements.Add(measurement);
 
-                    if (Application.Current is not null)                    
-                        Application.Current?.Dispatcher.Invoke(() =>
+                    CurrentSeries.Add(measurement);
+
+                    if (Application.Current is not null)
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
                         {
                             PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
 
                             AdjustXAxis(measurement.Timestamp);
                             AdjustYAxis(measurement.Timestamp);
 
-
                             ExportToExcelCommand.NotifyCanExecuteChanged();
                             ClearGraphCommand.NotifyCanExecuteChanged();
                             ShowHideMarkersCommand.NotifyCanExecuteChanged();
+
+                            PlotModel.InvalidatePlot(true); // invalida dentro do Dispatcher
                         });
-                    PlotModel.InvalidatePlot(true);
+                    }
 
                     CurrentDistance = $"Relativa: {measurement.Distance}mm | Absoluta: {measurement.DistanceAbsolute}mm";
                 }
@@ -465,8 +478,11 @@ namespace Intron.LaserMonitor.ViewModels
                     Distance = 0,
                     DistanceAbsolute = 0
                 };
-                _allMeasurements.Add(measurement);
+
+                CurrentSeries.Add(measurement);
+
                 if (Application.Current is not null)
+                {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
@@ -477,12 +493,15 @@ namespace Intron.LaserMonitor.ViewModels
                         ExportToExcelCommand.NotifyCanExecuteChanged();
                         ClearGraphCommand.NotifyCanExecuteChanged();
                         ShowHideMarkersCommand.NotifyCanExecuteChanged();
+
+                        PlotModel.InvalidatePlot(true);
                     });
-                PlotModel.InvalidatePlot(true);
+                }
 
                 CurrentDistance = "N/A";
             }
         }
+
 
         public void Dispose()
         {
