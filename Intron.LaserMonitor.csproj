@@ -20,11 +20,16 @@
     <None Remove="Assets\Fonts\Inter-Thin.ttf" />
     <None Remove="Assets\Images\icons8-conectado-50.png" />
     <None Remove="Assets\Images\icons8-desconectado-50.png" />
+    <None Remove="Assets\Images\icons8-exclamation-50.png" />
     <None Remove="Assets\Images\icons8-grafico-24-white.png" />
     <None Remove="Assets\Images\icons8-grafico-24.png" />
     <None Remove="Assets\Images\icons8-graph-gif-white.gif" />
     <None Remove="Assets\Images\icons8-graph-gif.gif" />
     <None Remove="Assets\Images\icons8-graph-gif.png" />
+    <None Remove="Assets\Images\icons8-info-50.png" />
+    <None Remove="Assets\Images\icons8-question-50.png" />
+    <None Remove="Assets\Images\icons8-success-50.png" />
+    <None Remove="Assets\Images\icons8-warning-50.png" />
     <None Remove="Assets\Images\logo-intron-50.png" />
     <None Remove="Assets\Images\logo-name-min-50.png" />
     <None Remove="Assets\Images\monitor-graph-white.png" />
@@ -41,6 +46,7 @@
     <Resource Include="Assets\Images\icons8-desconectado-50.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Assets\Images\icons8-exclamation-50.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -91,6 +97,10 @@
     </Resource>
     <Resource Include="Assets\Images\icons8-graph-gif-white.gif" />
     <Resource Include="Assets\Images\icons8-graph-gif.gif" />
+    <Resource Include="Assets\Images\icons8-info-50.png" />
+    <Resource Include="Assets\Images\icons8-question-50.png" />
+    <Resource Include="Assets\Images\icons8-success-50.png" />
+    <Resource Include="Assets\Images\icons8-warning-50.png" />
     <Resource Include="Assets\Images\logo-intron-50.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>

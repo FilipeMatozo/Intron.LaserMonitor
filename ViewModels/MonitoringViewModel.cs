@@ -1,20 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Intron.LaserMonitor.Contracts.Services;
+using Intron.LaserMonitor.CustomControls.MyMessageBox;
+using Intron.LaserMonitor.CustomControls.MyMessageBox.Enums;
 using Intron.LaserMonitor.Models;
 using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.Metrics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Intron.LaserMonitor.ViewModels
 {
@@ -143,11 +139,57 @@ namespace Intron.LaserMonitor.ViewModels
                 try
                 {
                     _excelService.Export(_allMeasurements, sfd.FileName);
-                    MessageBox.Show($"Dados exportados com sucesso para:\n{sfd.FileName}", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    //MessageBox.Show($"Dados exportados com sucesso para:\n{sfd.FileName}", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    var (result, dontAsk) = MyMessageBox.Show(
+                        owner: Application.Current?.MainWindow,
+                        options: new MyMessageBoxOptions(
+                            Title: "Exportação concluída",
+                            Message: "Dados exportados com sucesso!",
+                            Detail: sfd.FileName,
+                            Buttons: MyMessageBoxButtons.Custom,
+                            Icon: MyMessageBoxIcon.Success,
+                            PrimaryText: "Abrir arquivo",
+                            SecondaryText: "Mostrar na pasta",
+                            TertiaryText: "Fechar",
+                            AccentBrush: (Brush)Application.Current.Resources["DialogAccentBrush"],
+                            ShowCopyButton: false,
+                            ShowDoNotAskAgain: false,
+                            DefaultButton: MyMessageBoxDefaultButton.First,
+                            CancelResult: MyMessageBoxResult.Tertiary
+                        )
+                    );
+
+                    switch (result)
+                    {
+                        case MyMessageBoxResult.Primary:
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(sfd.FileName) { UseShellExecute = true });
+                            break;
+                        case MyMessageBoxResult.Secondary:
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"/select,\"{sfd.FileName}\"") { UseShellExecute = true });
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ocorreu um erro ao exportar:\n{ex.Message}", "Erro de Exportação", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _ = MyMessageBox.Show(
+                        owner: Application.Current?.MainWindow,
+                        options: new MyMessageBoxOptions(
+                            Title: "Erro ao exportar",
+                            Message: "Ocorreu um erro ao tentar exportar o arquivo:",
+                            Detail: ex.Message,
+                            Buttons: MyMessageBoxButtons.Ok,
+                            Icon: MyMessageBoxIcon.Error,
+                            AccentBrush: (Brush)Application.Current.Resources["DialogAccentBrush"],
+                            ShowCopyButton: true,
+                            ShowDoNotAskAgain: false,
+                            DefaultButton: MyMessageBoxDefaultButton.First,
+                            CancelResult: MyMessageBoxResult.Tertiary
+                        )
+                    );
+                    //MessageBox.Show($"Ocorreu um erro ao exportar:\n{ex.Message}", "Erro de Exportação", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
