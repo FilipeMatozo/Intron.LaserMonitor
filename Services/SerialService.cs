@@ -1,8 +1,11 @@
 ﻿using Intron.LaserMonitor.Contracts.Services;
+using Intron.LaserMonitor.CustomControls.MyMessageBox;
+using Intron.LaserMonitor.CustomControls.MyMessageBox.Enums;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Text;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Intron.LaserMonitor.Services
 {
@@ -108,7 +111,22 @@ namespace Intron.LaserMonitor.Services
 
                 if (!VerifyDevice())
                 {
-                    MessageBox.Show("Dispositivo inválido. Por favor conecte o laser.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _ = MyMessageBox.Show(
+                        owner: Application.Current?.MainWindow,
+                        options: new MyMessageBoxOptions(
+                            Title: "Erro no dispositivo",
+                            Message: "Dispositivo inválido:",
+                            Detail: "Por favor conecte o laser.",
+                            Buttons: MyMessageBoxButtons.Ok,
+                            Icon: MyMessageBoxIcon.Error,
+                            AccentBrush: (Brush)Application.Current.Resources["DialogAccentBrush"],
+                            ShowCopyButton: false,
+                            ShowDoNotAskAgain: false,
+                            DefaultButton: MyMessageBoxDefaultButton.First,
+                            CancelResult: MyMessageBoxResult.Tertiary
+                        )
+                    );
+                    //MessageBox.Show("Dispositivo inválido. Por favor conecte o laser.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                     Disconnect();
                     return false;
                 }
@@ -123,7 +141,22 @@ namespace Intron.LaserMonitor.Services
                 Debug.WriteLine($"Erro ao conectar a {portName} com {baudRate}: {ex}");
                 StopCheckRoutine();
                 Disconnect();
-                MessageBox.Show($"Falha ao conectar à porta serial.\n{ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                _ = MyMessageBox.Show(
+                    owner: Application.Current?.MainWindow,
+                    options: new MyMessageBoxOptions(
+                        Title: "Falha ao se conectar",
+                        Message: "Ocorreu um erro ao conectar à porta serial:",
+                        Detail: ex.Message,
+                        Buttons: MyMessageBoxButtons.Ok,
+                        Icon: MyMessageBoxIcon.Error,
+                        AccentBrush: (Brush)Application.Current.Resources["DialogAccentBrush"],
+                        ShowCopyButton: true,
+                        ShowDoNotAskAgain: false,
+                        DefaultButton: MyMessageBoxDefaultButton.First,
+                        CancelResult: MyMessageBoxResult.Tertiary
+                    )
+                );
+                //MessageBox.Show($"Falha ao conectar à porta serial.\n{ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
