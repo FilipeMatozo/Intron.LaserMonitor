@@ -232,7 +232,7 @@
                 <DockPanel
                     x:Name="DeviceConnection"
                     Height="50"
-                    Margin="{Binding DeviceConnectionMargin}"
+                    Margin="6, 0, 0, 0"
                     Background="{DynamicResource White}">
 
                     <Grid>

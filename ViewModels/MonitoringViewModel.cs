@@ -8,6 +8,7 @@ using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
+using OxyPlot.SkiaSharp.Wpf;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
@@ -34,16 +35,21 @@ namespace Intron.LaserMonitor.ViewModels
         [NotifyCanExecuteChangedFor(nameof(ZeroOffsetCommand))]
         private bool _isMeasuring = false;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsShowingMarkersText))]
+        private bool _isShowingMarkers = false;
+
         private CancellationTokenSource cancellationTokenSource = new();
 
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ClearGraphCommand))]
+        private string _currentDistance = "N/A";
+       
         public string StartStopText
         {
             get => !IsMeasuring && IsConnected ? "Iniciar" : "Interromper";
         }
 
-        [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(ClearGraphCommand))]
-        private string _currentDistance = "N/A";
         public string ConnectText
         {
             get => IsConnected ? "Desconectar" : "Conectar";
@@ -54,8 +60,19 @@ namespace Intron.LaserMonitor.ViewModels
             get => IsConnected ? "Conectado" : "Desconectado";
         }
 
+        public string IsShowingMarkersText
+        {
+            get => !IsShowingMarkers ? "Mostrar pontos" : "Esconder pontos";
+        }
+
+        public string IsShowingMarkersColor
+        {
+            get => !IsShowingMarkers ? "Mostrar pontos" : "Esconder pontos";
+        }
+
         public PlotModel PlotModel { get; private set; }
         public PlotController PlotController { get; private set; }
+        public LineSeries _lineSeries { get; private set; }
         public List<DataPoint> PlotPoints { get; private set; } = new();
 
         private int _maxSecsPlotPoint = 10;
@@ -206,6 +223,25 @@ namespace Intron.LaserMonitor.ViewModels
         }
         private bool CanClearGraph() => PlotPoints.Count() > 0 || CurrentDistance != "N/A";
 
+        [RelayCommand(CanExecute = nameof(CanShowHideMarkers))]
+        private void ShowHideMarkers()
+        {
+            if (_lineSeries == null) return;
+
+            if (IsShowingMarkers) {
+
+                _lineSeries.MarkerType = MarkerType.None;
+                IsShowingMarkers = false;
+            }
+            else
+            {
+                _lineSeries.MarkerType = MarkerType.C;
+                IsShowingMarkers = true;
+            }
+            PlotModel?.InvalidatePlot(true);
+        }
+        private bool CanShowHideMarkers() => PlotPoints.Count() > 0;
+
         private void SetupPlotModel()
         {
             PlotModel = new PlotModel { Title = "Distância do Laser vs. Tempo" };
@@ -243,6 +279,19 @@ namespace Intron.LaserMonitor.ViewModels
                             double x = axis.InverseTransform(args.Position.X);
                             axis.ZoomAt(zoomFactor, x);
                         }
+                        if(zoomFactor >= 1)
+                        {
+                            _lineSeries.MarkerType = MarkerType.Circle;
+                            IsShowingMarkers = true;
+                            ShowHideMarkersCommand.NotifyCanExecuteChanged();
+                        }
+                        else
+                        {
+                            _lineSeries.MarkerType = MarkerType.None;
+                            IsShowingMarkers = false;
+                            ShowHideMarkersCommand.NotifyCanExecuteChanged();
+                        }
+
                         view.InvalidatePlot(false);
                         args.Handled = true;
                     }));
@@ -300,17 +349,21 @@ namespace Intron.LaserMonitor.ViewModels
                 MinorGridlineStyle = LineStyle.Dot
             });
 
-            var lineSeries = new LineSeries
+            _lineSeries = new LineSeries
             {
                 Title = "Distância (mm)",
                 StrokeThickness = 2,
                 MarkerType = MarkerType.None,
+                MarkerSize = 5,
+                MarkerStroke = OxyColors.Green,
+                MarkerFill = OxyColors.White,
+                MarkerStrokeThickness = 1.2,
                 ItemsSource = PlotPoints,
                 TrackerFormatString = "Tempo: {2:HH:mm:ss.fff}\nDistância: {4:0} mm",
                 CanTrackerInterpolatePoints = false
             };
 
-            PlotModel.Series.Add(lineSeries);
+            PlotModel.Series.Add(_lineSeries);
         }
 
         private void OnDataReceived(object sender, Models.Events.DataReceivedEventArgs dataReceivedEventArgs)
@@ -395,6 +448,7 @@ namespace Intron.LaserMonitor.ViewModels
 
                             ExportToExcelCommand.NotifyCanExecuteChanged();
                             ClearGraphCommand.NotifyCanExecuteChanged();
+                            ShowHideMarkersCommand.NotifyCanExecuteChanged();
                         });
                     PlotModel.InvalidatePlot(true);
 
@@ -420,6 +474,7 @@ namespace Intron.LaserMonitor.ViewModels
 
                         ExportToExcelCommand.NotifyCanExecuteChanged();
                         ClearGraphCommand.NotifyCanExecuteChanged();
+                        ShowHideMarkersCommand.NotifyCanExecuteChanged();
                     });
                 PlotModel.InvalidatePlot(true);
 
