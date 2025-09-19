@@ -235,7 +235,7 @@ namespace Intron.LaserMonitor.ViewModels
             }
             else
             {
-                _lineSeries.MarkerType = MarkerType.C;
+                _lineSeries.MarkerType = MarkerType.Circle;
                 IsShowingMarkers = true;
             }
             PlotModel?.InvalidatePlot(true);
