@@ -157,7 +157,7 @@ namespace Intron.LaserMonitor.ViewModels
             {
                 try
                 {
-                    //_excelService.Export(_allMeasurements, sfd.FileName);
+                    _excelService.Export(_allMeasurements, sfd.FileName);
                     //MessageBox.Show($"Dados exportados com sucesso para:\n{sfd.FileName}", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     var (result, dontAsk) = MyMessageBox.Show(
