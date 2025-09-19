@@ -124,6 +124,7 @@ namespace Intron.LaserMonitor.ViewModels
             {
                 await _serialService.StopMeasurement(cancellationTokenSource.Token);
                 CurrentDistance = "Medição parada.";
+                ExportToExcel();
             }
         }
         private bool CanStartStopMeasurement() => IsConnected;
@@ -467,7 +468,7 @@ namespace Intron.LaserMonitor.ViewModels
                         });
                     }
 
-                    CurrentDistance = $"Relativa: {measurement.Distance}mm | Absoluta: {measurement.DistanceAbsolute}mm";
+                    CurrentDistance = $"Relativa: {measurement.Distance:F0}mm | Absoluta: {measurement.DistanceAbsolute:F0}mm";
                 }
             }
             else if (data.StartsWith("E="))
