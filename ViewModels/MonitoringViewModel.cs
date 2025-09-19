@@ -220,6 +220,8 @@ namespace Intron.LaserMonitor.ViewModels
             PlotModel.InvalidatePlot(true);
             _zeroOffset = 0;
             CurrentDistance = "N/A";
+            ExportToExcelCommand.NotifyCanExecuteChanged();
+            ShowHideMarkersCommand.NotifyCanExecuteChanged();
         }
         private bool CanClearGraph() => PlotPoints.Count() > 0 || CurrentDistance != "N/A";
 
