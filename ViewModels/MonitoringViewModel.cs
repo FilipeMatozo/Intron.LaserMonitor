@@ -136,7 +136,7 @@ namespace Intron.LaserMonitor.ViewModels
             _zeroOffset = _allMeasurements[^1].Last().DistanceAbsolute;
             _allMeasurements.Add([]);
             //_allMeasurements.Clear();
-            //PlotPoints.Clear();
+            PlotPoints.Clear();
         }
         private bool CanZeroOffset() => IsConnected && IsMeasuring;
 
