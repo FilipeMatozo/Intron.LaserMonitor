@@ -19,7 +19,7 @@ namespace Intron.LaserMonitor.ViewModels
     {
         private readonly ISerialService _serialService;
         private readonly IExcelExportService _excelService;
-        private readonly List<List<Measurement>> _allMeasurements = new() { new() };
+        private readonly List<List<Measurement>> _allMeasurements = [[]];
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ConnectText))]
@@ -70,10 +70,10 @@ namespace Intron.LaserMonitor.ViewModels
             get => !IsShowingMarkers ? "Mostrar pontos" : "Esconder pontos";
         }
 
-        public PlotModel PlotModel { get; private set; }
-        public PlotController PlotController { get; private set; }
-        public LineSeries _lineSeries { get; private set; }
-        public List<DataPoint> PlotPoints { get; private set; } = new();
+        public PlotModel PlotModel { get; private set; } = new() { Title = "Distância do Laser vs. Tempo" };
+        public PlotController PlotController { get; private set; } = new();
+        public LineSeries _lineSeries { get; private set; } = new();
+        public List<DataPoint> PlotPoints { get; private set; } = [];
 
         private int _maxSecsPlotPoint = 10;
         private double _zeroOffset = 0;
@@ -83,7 +83,7 @@ namespace Intron.LaserMonitor.ViewModels
             _serialService = serialService;
             _excelService = excelExportService;
             IsConnected = _serialService.IsConnected;
-            
+
             SetupPlotModel();
             SubscribeEvents();
         }
@@ -107,7 +107,7 @@ namespace Intron.LaserMonitor.ViewModels
         private void _serialService_OnMeasurementStateChanged(object? sender, bool isMeasuring) => IsMeasuring = isMeasuring;
 
         [RelayCommand(CanExecute = nameof(CanStartStopMeasurement))]
-        private async void StartStopMeasurement()
+        private async Task StartStopMeasurement()
         {
             if (!IsMeasuring)
             {
@@ -133,16 +133,16 @@ namespace Intron.LaserMonitor.ViewModels
         [RelayCommand(CanExecute = nameof(CanZeroOffset))]
         private void ZeroOffset()
         {
-            _zeroOffset = _allMeasurements[_allMeasurements.Count - 1].Last().DistanceAbsolute;
+            _zeroOffset = _allMeasurements[^1].Last().DistanceAbsolute;
             _allMeasurements.Add([]);
             //_allMeasurements.Clear();
             //PlotPoints.Clear();
         }
         private bool CanZeroOffset() => IsConnected && IsMeasuring;
 
-        private void OnConnected(object sender, EventArgs e) => IsConnected = true;
+        private void OnConnected(object? sender, EventArgs e) => IsConnected = true;
 
-        private void OnDisconnected(object sender, EventArgs e) => IsConnected = false;
+        private void OnDisconnected(object? sender, EventArgs e) => IsConnected = false;
 
         [RelayCommand(CanExecute = nameof(CanExport))]
         private void ExportToExcel()
@@ -172,7 +172,7 @@ namespace Intron.LaserMonitor.ViewModels
                             PrimaryText: "Abrir arquivo",
                             SecondaryText: "Mostrar na pasta",
                             TertiaryText: "Fechar",
-                            AccentBrush: (Brush)Application.Current.Resources["DialogAccentBrush"],
+                            AccentBrush: (Brush)Application.Current?.Resources["DialogAccentBrush"]!,
                             ShowCopyButton: false,
                             ShowDoNotAskAgain: false,
                             DefaultButton: MyMessageBoxDefaultButton.First,
@@ -202,7 +202,7 @@ namespace Intron.LaserMonitor.ViewModels
                             Detail: ex.Message,
                             Buttons: MyMessageBoxButtons.Ok,
                             Icon: MyMessageBoxIcon.Error,
-                            AccentBrush: (Brush)Application.Current.Resources["DialogAccentBrush"],
+                            AccentBrush: (Brush)Application.Current?.Resources["DialogAccentBrush"]!,
                             ShowCopyButton: true,
                             ShowDoNotAskAgain: false,
                             DefaultButton: MyMessageBoxDefaultButton.First,
@@ -250,8 +250,6 @@ namespace Intron.LaserMonitor.ViewModels
 
         private void SetupPlotModel()
         {
-            PlotModel = new PlotModel { Title = "Distância do Laser vs. Tempo" };
-            PlotController = new PlotController();
             PlotController.UnbindAll();
             PlotController.BindMouseEnter(PlotCommands.HoverSnapTrack);
 
@@ -372,7 +370,7 @@ namespace Intron.LaserMonitor.ViewModels
             PlotModel.Series.Add(_lineSeries);
         }
 
-        private void OnDataReceived(object sender, Models.Events.DataReceivedEventArgs e)
+        private void OnDataReceived(object? sender, Models.Events.DataReceivedEventArgs e)
         {
             List<Measurement> CurrentSeries = _allMeasurements[^1]; // série atual (última)
 
@@ -451,22 +449,19 @@ namespace Intron.LaserMonitor.ViewModels
 
                     CurrentSeries.Add(measurement);
 
-                    if (Application.Current is not null)
+                    Application.Current?.Dispatcher.Invoke(() =>
                     {
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+                        PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
 
-                            AdjustXAxis(measurement.Timestamp);
-                            AdjustYAxis(measurement.Timestamp);
+                        AdjustXAxis(measurement.Timestamp);
+                        AdjustYAxis(measurement.Timestamp);
 
-                            ExportToExcelCommand.NotifyCanExecuteChanged();
-                            ClearGraphCommand.NotifyCanExecuteChanged();
-                            ShowHideMarkersCommand.NotifyCanExecuteChanged();
+                        ExportToExcelCommand.NotifyCanExecuteChanged();
+                        ClearGraphCommand.NotifyCanExecuteChanged();
+                        ShowHideMarkersCommand.NotifyCanExecuteChanged();
 
-                            PlotModel.InvalidatePlot(true); // invalida dentro do Dispatcher
-                        });
-                    }
+                        PlotModel.InvalidatePlot(true); // invalida dentro do Dispatcher
+                    });
 
                     CurrentDistance = $"Relativa: {measurement.Distance:F0}mm | Absoluta: {measurement.DistanceAbsolute:F0}mm";
                 }
@@ -482,22 +477,19 @@ namespace Intron.LaserMonitor.ViewModels
 
                 CurrentSeries.Add(measurement);
 
-                if (Application.Current is not null)
+                Application.Current?.Dispatcher.Invoke(() =>
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
+                    PlotPoints.Add(new DataPoint(DateTimeAxis.ToDouble(measurement.Timestamp), measurement.Distance));
 
-                        AdjustXAxis(measurement.Timestamp);
-                        AdjustYAxis(measurement.Timestamp);
+                    AdjustXAxis(measurement.Timestamp);
+                    AdjustYAxis(measurement.Timestamp);
 
-                        ExportToExcelCommand.NotifyCanExecuteChanged();
-                        ClearGraphCommand.NotifyCanExecuteChanged();
-                        ShowHideMarkersCommand.NotifyCanExecuteChanged();
+                    ExportToExcelCommand.NotifyCanExecuteChanged();
+                    ClearGraphCommand.NotifyCanExecuteChanged();
+                    ShowHideMarkersCommand.NotifyCanExecuteChanged();
 
-                        PlotModel.InvalidatePlot(true);
-                    });
-                }
+                    PlotModel.InvalidatePlot(true);
+                });
 
                 CurrentDistance = "N/A";
             }

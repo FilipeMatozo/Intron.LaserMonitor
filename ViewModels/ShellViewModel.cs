@@ -63,7 +63,7 @@ public partial class ShellViewModel : ObservableRecipient // TODO: Tornar a clas
     [ObservableProperty] private ObservableCollection<MenuItemModel> menuItemModelList = new();
     [ObservableProperty] private bool isMenuItemListOpen;
     [ObservableProperty] Thickness deviceConnectionMargin;
-    [ObservableProperty] private object currentUserControl;
+    [ObservableProperty] private object currentUserControl = new();
     #endregion
     public ShellViewModel(ISerialService serialService)
     {

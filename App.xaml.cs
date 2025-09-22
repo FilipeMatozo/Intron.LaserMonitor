@@ -28,7 +28,6 @@ namespace Intron.LaserMonitor
 
             return service;
         }
-        private Window MainWindow { get; } = new();
 
         public App()
         {

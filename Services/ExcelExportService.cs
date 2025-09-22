@@ -13,29 +13,27 @@ namespace Intron.LaserMonitor.Services
         {
             ExcelPackage.License.SetNonCommercialOrganization("My Noncommercial organization");
 
-            using (var package = new ExcelPackage())
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Medições Laser");
+
+            worksheet.Cells[1, 1].Value = "Timestamp";
+            worksheet.Cells[1, 2].Value = "Distância (mm)";
+            worksheet.Cells[1, 3].Value = "Distância Absoluta (mm)";
+            worksheet.Cells[1, 1, 1, 3].Style.Font.Bold = true;
+
+            int row = 2;
+            foreach (var point in data)
             {
-                var worksheet = package.Workbook.Worksheets.Add("Medições Laser");
-
-                worksheet.Cells[1, 1].Value = "Timestamp";
-                worksheet.Cells[1, 2].Value = "Distância (mm)";
-                worksheet.Cells[1, 3].Value = "Distância Absoluta (mm)";
-                worksheet.Cells[1, 1, 1, 3].Style.Font.Bold = true;
-
-                int row = 2;
-                foreach (var point in data)
-                {
-                    worksheet.Cells[row, 1].Value = point.Timestamp;
-                    worksheet.Cells[row, 1].Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss.000";
-                    worksheet.Cells[row, 2].Value = point.Distance;
-                    worksheet.Cells[row, 3].Value = point.DistanceAbsolute;
-                    row++;
-                }
-
-                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
-
-                File.WriteAllBytes(filePath, package.GetAsByteArray());
+                worksheet.Cells[row, 1].Value = point.Timestamp;
+                worksheet.Cells[row, 1].Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss.000";
+                worksheet.Cells[row, 2].Value = point.Distance;
+                worksheet.Cells[row, 3].Value = point.DistanceAbsolute;
+                row++;
             }
+
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+            File.WriteAllBytes(filePath, package.GetAsByteArray());
         }
 
         public void Export(IEnumerable<IEnumerable<Measurement>> allBatches, string filePath)
@@ -62,7 +60,7 @@ namespace Intron.LaserMonitor.Services
             // Percorre cada lote (série lógica)
             foreach (var series in allBatches)
             {
-                if (series == null || series.Count() == 0)
+                if (series == null || !series.Any())
                     continue;
 
                 seriesNumber++;
@@ -116,6 +114,7 @@ namespace Intron.LaserMonitor.Services
 
             // Salva
             File.WriteAllBytes(filePath, package.GetAsByteArray());
+            package.Dispose();
         }
     }
 }
