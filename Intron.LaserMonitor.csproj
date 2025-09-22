@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\Images\logo-intron.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,11 +32,16 @@
     <None Remove="Assets\Images\icons8-success-50.png" />
     <None Remove="Assets\Images\icons8-warning-50.png" />
     <None Remove="Assets\Images\logo-intron-50.png" />
+    <None Remove="Assets\Images\logo-intron.ico" />
     <None Remove="Assets\Images\logo-name-min-50.png" />
     <None Remove="Assets\Images\monitor-graph-white.png" />
     <None Remove="Assets\Images\monitor-graph.png" />
     <None Remove="Shaders\Invert.ps" />
     <None Remove="Shaders\InvertChromaKey.ps" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Images\logo-intron.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -104,6 +110,7 @@
     <Resource Include="Assets\Images\logo-intron-50.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Assets\Images\logo-intron.ico" />
     <Resource Include="Assets\Images\logo-name-min-50.png" />
     <Resource Include="Shaders\Invert.ps" />
     <Resource Include="Shaders\InvertChromaKey.ps">
