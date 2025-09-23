@@ -36,8 +36,6 @@
     <None Remove="Assets\Images\logo-name-min-50.png" />
     <None Remove="Assets\Images\monitor-graph-white.png" />
     <None Remove="Assets\Images\monitor-graph.png" />
-    <None Remove="Shaders\Invert.ps" />
-    <None Remove="Shaders\InvertChromaKey.ps" />
   </ItemGroup>
 
   <ItemGroup>
@@ -112,10 +110,6 @@
     </Resource>
     <Resource Include="Assets\Images\logo-intron.ico" />
     <Resource Include="Assets\Images\logo-name-min-50.png" />
-    <Resource Include="Shaders\Invert.ps" />
-    <Resource Include="Shaders\InvertChromaKey.ps">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
 </Project>
